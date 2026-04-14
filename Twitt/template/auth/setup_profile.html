@@ -1,0 +1,239 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تنظیمات پروفایل - Twitter Clone</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+            padding: 40px;
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #1da1f2;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .header p {
+            color: #657786;
+            font-size: 14px;
+        }
+        .avatar-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .avatar-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1da1f2 0%, #0d8bd9 100%);
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 45px;
+            font-weight: bold;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .avatar-preview:hover {
+            transform: scale(1.05);
+        }
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .avatar-label {
+            color: #1da1f2;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .avatar-label:hover {
+            text-decoration: underline;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #14171a;
+            font-size: 14px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #e1e8ed;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s;
+            background: #f5f8fa;
+            color: #14171a;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #1da1f2;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(29, 161, 242, 0.15);
+        }
+        .form-group textarea {
+            resize: none;
+            min-height: 100px;
+        }
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: #657786;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #1da1f2 0%, #0d8bd9 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(29, 161, 242, 0.3);
+        }
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+        .skip-link {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #657786;
+            font-size: 14px;
+            text-decoration: none;
+        }
+        .skip-link:hover {
+            color: #1da1f2;
+            text-decoration: underline;
+        }
+        .error-message {
+            color: #e0245e;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+        /* Responsive */
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+            .header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>تنظیمات پروفایل</h1>
+            <p>اطلاعات خود را تکمیل کنید</p>
+        </div>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="avatar-section">
+                <label for="id_image" class="avatar-preview" id="avatarPreview">
+                    {% if form.instance.image %}
+                        <img src="{{ form.instance.image.url }}" alt="Profile">
+                    {% else %}
+                        <span>👤</span>
+                    {% endif %}
+                </label>
+                <label for="id_image" class="avatar-label">تغییر عکس پروفایل</label>
+                <input type="file" name="image" id="id_image" accept="image/*" style="display: none;">
+            </div>
+
+            <div class="form-group">
+                <label for="id_name">نام کامل</label>
+                <input type="text" name="name" id="id_name" placeholder="نام و نام خانوادگی" required>
+                {% if form.name.errors %}
+                    <p class="error-message">{{ form.name.errors }}</p>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_bio">درباره شما</label>
+                <textarea name="bio" id="id_bio" placeholder="درباره خودتان بنویسید..."></textarea>
+                {% if form.bio.errors %}
+                    <p class="error-message">{{ form.bio.errors }}</p>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_gender">جنسیت</label>
+                <select name="gender" id="id_gender">
+                    <option value="M">مرد</option>
+                    <option value="F">زن</option>
+                </select>
+                {% if form.gender.errors %}
+                    <p class="error-message">{{ form.gender.errors }}</p>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="submit-btn">ذخیره و ادامه</button>
+
+            <a href="{% url 'home' %}" class="skip-link">الان نه، بعداً</a>
+        </form>
+    </div>
+
+    <script>
+        // پیش‌نمایش عکس پروفایل
+        document.getElementById('id_image').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('avatarPreview');
+                    preview.innerHTML = '<img src="' + e.target.result + '" alt="Profile">';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html>

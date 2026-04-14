@@ -1,0 +1,344 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تأیید کد - Twitter Clone</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 380px;
+            padding: 35px 30px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 45px;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            color: #111;
+            margin-bottom: 8px;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .phone-display {
+            background: #e8f5fe;
+            color: #1da1f2;
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 25px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .otp-container {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 25px;
+        }
+
+        .otp-input {
+            width: 48px;
+            height: 55px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            transition: border-color 0.2s, background 0.2s;
+            background: #f9f9f9;
+            color: #111;
+            outline: none;
+        }
+
+        .otp-input:focus {
+            border-color: #1da1f2;
+            background: white;
+        }
+
+        .otp-input.filled {
+            border-color: #1da1f2;
+            background: #e8f5fe;
+        }
+
+        .otp-input.error {
+            border-color: #e74c3c;
+            background: #fdf0ed;
+        }
+
+        .submit-btn {
+            background: #1da1f2;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 14px;
+            width: 100%;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .submit-btn:hover {
+            background: #1a91da;
+        }
+
+        .submit-btn:disabled {
+            background: #b0d8f0;
+            cursor: not-allowed;
+        }
+
+        .resend {
+            margin-top: 25px;
+            color: #666;
+            font-size: 13px;
+        }
+
+        .resend a {
+            color: #1da1f2;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .resend a:hover {
+            text-decoration: underline;
+        }
+
+        .timer {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            background: #fdf0ed;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        @media (max-width: 400px) {
+            .container {
+                padding: 25px 20px;
+            }
+            .otp-input {
+                width: 42px;
+                height: 50px;
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🐦</div>
+        <h1>کد تأیید را وارد کنید</h1>
+        <p class="subtitle">کد ۶ رقمی به شماره {{ phone }} ارسال شده</p>
+
+        <div class="phone-display">
+            📱 {{ phone }}
+        </div>
+
+        {% if form.errors %}
+        <div class="error-message show">
+            {% for field in form %}
+                {% for error in field.errors %}
+                    {{ error }}
+                {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+                {{ error }}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="post" id="otpForm">
+            {% csrf_token %}
+            <input type="hidden" name="code" id="hiddenCode">
+
+            <div class="otp-container">
+                <input type="text" class="otp-input" maxlength="1" data-index="0" autofocus>
+                <input type="text" class="otp-input" maxlength="1" data-index="1">
+                <input type="text" class="otp-input" maxlength="1" data-index="2">
+                <input type="text" class="otp-input" maxlength="1" data-index="3">
+                <input type="text" class="otp-input" maxlength="1" data-index="4">
+                <input type="text" class="otp-input" maxlength="1" data-index="5">
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">
+                تأیید کد
+            </button>
+        </form>
+
+        <div class="resend">
+            <span class="timer" id="timer">02:00</span>
+            <span>ثانیه تا امکان ارسال مجدد</span>
+            <br><br>
+            <a href="{% url 'request_otp' %}">تغییر شماره تلفن</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('.otp-input');
+            const form = document.getElementById('otpForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const hiddenCode = document.getElementById('hiddenCode');
+
+            // تایمر شمارش معکوس
+            let timeLeft = 120;
+            const timerElement = document.getElementById('timer');
+
+            const timer = setInterval(() => {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerElement.textContent =
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    timerElement.parentElement.innerHTML = '<a href="#" onclick="location.reload()">ارسال مجدد کد</a>';
+                }
+                timeLeft--;
+            }, 1000);
+
+            // مدیریت ورودی‌ها
+            inputs.forEach((input, index) => {
+                // ورود عدد - رفتن به باکس بعدی
+                input.addEventListener('input', function(e) {
+                    const value = e.target.value;
+
+                    // فقط عدد قبول شود
+                    e.target.value = value.replace(/[^0-9]/g, '');
+
+                    if (value.length === 1) {
+                        e.target.classList.add('filled');
+                        if (index < inputs.length - 1) {
+                            inputs[index + 1].focus();
+                        }
+                    }
+
+                    checkAllFilled();
+                });
+
+                // دکمه backspace - رفتن به باکس قبلی
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace') {
+                        if (input.value === '' && index > 0) {
+                            inputs[index - 1].focus();
+                        }
+                    }
+
+                    // دکمه enter برای ارسال
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (isAllFilled()) {
+                            form.submit();
+                        }
+                    }
+                });
+
+                // کلیک روی باکس - انتخاب همه متن
+                input.addEventListener('click', function() {
+                    this.select();
+                });
+
+                // پیست - پر کردن همه باکس‌ها
+                input.addEventListener('paste', function(e) {
+                    e.preventDefault();
+                    const pasteData = e.clipboardData.getData('text');
+                    const numbers = pasteData.replace(/[^0-9]/g, '').split('').slice(0, 6);
+
+                    numbers.forEach((num, i) => {
+                        if (inputs[i]) {
+                            inputs[i].value = num;
+                            inputs[i].classList.add('filled');
+                        }
+                    });
+
+                    // فوکوس روی آخرین باکس پر شده
+                    if (numbers.length > 0 && numbers.length < 6) {
+                        inputs[numbers.length].focus();
+                    } else if (numbers.length === 6) {
+                        inputs[5].focus();
+                    }
+
+                    checkAllFilled();
+                });
+            });
+
+            // بررسی اینکه همه کادرها پر شده‌اند
+            function isAllFilled() {
+                return Array.from(inputs).every(input => input.value.length === 1);
+            }
+
+            function checkAllFilled() {
+                if (isAllFilled()) {
+                    submitBtn.disabled = false;
+                } else {
+                    submitBtn.disabled = true;
+                }
+            }
+
+            // ارسال فرم
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                // جمع‌آوری کد از همه باکس‌ها
+                let code = '';
+                inputs.forEach(input => {
+                    code += input.value;
+                });
+
+                hiddenCode.value = code;
+
+                // ارسال فرم
+                this.submit();
+            });
+
+            // غیرفعال کردن دکمه در ابتدا
+            submitBtn.disabled = true;
+
+            // فوکوس روی اولین باکس
+            inputs[0].focus();
+        });
+    </script>
+</body>
+</html>

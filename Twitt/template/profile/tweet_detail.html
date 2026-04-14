@@ -1,0 +1,710 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>توییت - Twitter Clone</title>
+    <style>
+        :root {
+            --primary: #1d9bf0;
+            --primary-hover: #1a8cd8;
+            --text: #0f1419;
+            --gray: #536471;
+            --light-gray: #eff3f4;
+            --border: #cfd9de;
+            --like: #f91880;
+            --retweet: #00ba7c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #fff;
+            color: var(--text);
+        }
+
+        .layout {
+            display: flex;
+            max-width: 1260px;
+            margin: 0 auto;
+        }
+
+        /* سایدبار چپ */
+        .sidebar {
+            width: 275px;
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            border-left: 1px solid var(--border);
+        }
+
+        .logo {
+            font-size: 28px;
+            color: var(--primary);
+            margin-bottom: 25px;
+            padding: 10px;
+            display: inline-block;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin: 5px 0;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text);
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .nav-item:hover {
+            background: var(--light-gray);
+        }
+
+        .nav-item span {
+            margin-right: 20px;
+        }
+
+        /* فید اصلی */
+        .main {
+            flex: 1;
+            max-width: 600px;
+            border-left: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+        }
+
+        .back-btn:hover {
+            background: var(--light-gray);
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        /* توییت اصلی */
+        .tweet-detail {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tweet-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+            font-size: 20px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .user-handle {
+            color: var(--gray);
+            font-size: 15px;
+        }
+
+        .tweet-text {
+            font-size: 18px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .tweet-time {
+            color: var(--gray);
+            font-size: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 15px;
+        }
+
+        .tweet-stats {
+            display: flex;
+            gap: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 15px;
+        }
+
+        .stat-item {
+            font-size: 15px;
+        }
+
+        .stat-item strong {
+            font-weight: 700;
+        }
+
+        .tweet-actions {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--gray);
+            font-size: 14px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 12px;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .action-btn.reply:hover {
+            color: var(--primary);
+        }
+
+        .action-btn.retweet:hover {
+            color: var(--retweet);
+        }
+
+        .action-btn.like:hover {
+            color: var(--like);
+        }
+
+        .action-btn.like.liked {
+            color: var(--like);
+        }
+
+        .action-icon {
+            font-size: 20px;
+        }
+
+        /* تصویر */
+        .tweet-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            margin-bottom: 15px;
+        }
+
+        /* ریپلای */
+        .replies-section {
+            padding: 15px;
+        }
+
+        .replies-header {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .reply-tweet {
+            display: flex;
+            gap: 12px;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .reply-tweet:hover {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .reply-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+            font-size: 16px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .reply-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .reply-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .reply-header {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 4px;
+        }
+
+        .reply-name {
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .reply-handle {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .reply-time {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .reply-text {
+            font-size: 15px;
+            line-height: 1.4;
+        }
+
+        /* فرم ریپلای */
+        .reply-form {
+            display: flex;
+            gap: 12px;
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .reply-form textarea {
+            flex: 1;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 12px 16px;
+            font-size: 15px;
+            resize: none;
+            min-height: 50px;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .reply-form textarea:focus {
+            border-color: var(--primary);
+        }
+
+        .reply-form button {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 14px;
+            align-self: flex-end;
+        }
+
+        .reply-form button:hover {
+            background: var(--primary-hover);
+        }
+
+        .reply-form button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* حذف توییت */
+        .delete-tweet-btn {
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            font-size: 14px;
+            margin-right: auto;
+        }
+
+        .delete-tweet-btn:hover {
+            background: rgba(249, 24, 128, 0.1);
+            color: var(--like);
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 88px;
+                padding: 10px;
+            }
+
+            .sidebar .nav-item span {
+                display: none;
+            }
+
+            .main {
+                max-width: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main {
+                border: none;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="layout">
+    <!-- سایدبار چپ -->
+    <aside class="sidebar">
+        <a href="{% url 'home' %}" class="logo">𝕏</a>
+        <nav>
+            <ul class="nav-menu">
+                <li><a href="{% url 'home' %}" class="nav-item">🏠 <span>خانه</span></a></li>
+                <li><a href="#" class="nav-item">🔍 <span>جستجو</span></a></li>
+                <li><a href="#" class="nav-item">🔔 <span>اعلانات</span></a></li>
+                <li><a href="#" class="nav-item">✉️ <span>پیام‌ها</span></a></li>
+                <li><a href="{% url 'profile' %}" class="nav-item">👤 <span>پروفایل</span></a></li>
+            </ul>
+        </nav>
+        {% if user.is_authenticated %}
+            <form method="POST" action="{% url 'logout' %}" style="margin-top: auto;">
+                {% csrf_token %}
+                <button type="submit" class="nav-item"
+                        style="width: 100%; border: none; background: none; text-align: right;">
+                    🚪 <span>خروج</span>
+                </button>
+            </form>
+        {% else %}
+            <a href="{% url 'request_otp' %}" class="tweet-btn"
+               style="display: block; background: var(--primary); color: #fff; border: none; border-radius: 30px; padding: 15px; font-size: 17px; font-weight: 700; margin-top: 20px; cursor: pointer; width: 90%; text-align: center; text-decoration: none;">ورود</a>
+        {% endif %}
+    </aside>
+
+    <!-- فید اصلی -->
+    <main class="main">
+        <header class="header">
+            <a href="{% url 'home' %}" class="back-btn">←</a>
+            <h1>توییت</h1>
+        </header>
+
+        <!-- توییت اصلی -->
+        <article class="tweet-detail">
+            <div class="tweet-header">
+                <div class="avatar">
+                    {% if tweet.user.profile.image %}
+                        <img src="{{ tweet.user.profile.image.url }}" alt="{{ tweet.user.username }}">
+                    {% else %}
+                        {{ tweet.user.username|make_list|first|upper }}
+                    {% endif %}
+                </div>
+                <div class="user-info">
+                    <span class="user-name">{{ tweet.user.get_full_name|default:tweet.user.username }}</span>
+                    <span class="user-handle">@{{ tweet.user.username }}</span>
+                </div>
+                {% if user.is_authenticated and tweet.user == user %}
+                    <form method="POST" action="{% url 'delete_tweet' tweet.id %}"
+                          onsubmit="return confirm('این توییت حذف شود؟')">
+                        {% csrf_token %}
+                        <button type="submit" class="delete-tweet-btn" title="حذف توییت">🗑️</button>
+                    </form>
+                {% endif %}
+            </div>
+
+            <p class="tweet-text">{{ tweet.content }}</p>
+
+            {% if tweet.image %}
+                <img src="{{ tweet.image.url }}" alt="تصویر" class="tweet-image">
+            {% endif %}
+
+
+            {% if tweet.video %}
+                <video class="tweet-image" controls onclick="event.stopPropagation()">
+                    <source src="{{ tweet.video.url }}" type="video/mp4">
+                </video>
+            {% endif %}
+
+            {% if tweet.voice %}
+                <div class="tweet-voice" style="margin-bottom: 10px;">
+                    <audio controls style="width: 100%; border-radius: 12px;">
+                        <source src="{{ tweet.voice.url }}" type="audio/mpeg">
+                    </audio>
+                </div>
+            {% endif %}
+
+
+            <div class="tweet-time">
+                {{ tweet.created_at|date:"H:i" }} · {{ tweet.created_at|date:"Y/m/d" }}
+            </div>
+
+            <div class="tweet-stats">
+                <span class="stat-item"><strong>{{ replies.count }}</strong> ریپلای</span>
+                <span class="stat-item"><strong>{{ tweet.likes.count }}</strong> لایک</span>
+                <span class="stat-item"><strong>{{ tweet.views_count }}</strong> بازدید</span>
+            </div>
+
+            <div class="tweet-actions">
+                <button class="action-btn reply">
+                    <span class="action-icon">💬</span>
+                    <span>{{ replies.count }}</span>
+                </button>
+                <button class="action-btn retweet">
+                    <span class="action-icon">🔁</span>
+                    <span>0</span>
+                </button>
+                {% if user.is_authenticated %}
+                    <button class="action-btn like {% if user_liked %}liked{% endif %}"
+                            data-tweet-id="{{ tweet.id }}"
+                            onclick="toggleLike({{ tweet.id }}, this)">
+                        <span class="action-icon">{% if user_liked %}❤️{% else %}🤍{% endif %}</span>
+                        <span class="like-count">{{ tweet.likes.count }}</span>
+                    </button>
+                {% else %}
+                    <a href="{% url 'request_otp' %}" class="action-btn like">
+                        <span class="action-icon">🤍</span>
+                        <span>{{ tweet.likes.count }}</span>
+                    </a>
+                {% endif %}
+                <button class="action-btn share">
+                    <span class="action-icon">📤</span>
+                </button>
+            </div>
+        </article>
+
+        <!-- فرم ارسال ریپلای -->
+        {% if user.is_authenticated %}
+            <form class="reply-form" onsubmit="return submitReply(event, {{ tweet.id }})">
+                {% csrf_token %}
+                <div class="avatar">
+                    {% if user.profile.image %}
+                        <img src="{{ user.profile.image.url }}" alt="{{ user.username }}">
+                    {% else %}
+                        {{ user.username|make_list|first|upper }}
+                    {% endif %}
+                </div>
+                <div class="reply-input-container">
+            <textarea
+                    name="content"
+                    id="reply-content-{{ tweet.id }}"
+                    placeholder="توییت کنید..."
+                    maxlength="280"
+                    oninput="toggleReplyButton({{ tweet.id }})"
+            ></textarea>
+                    <!-- نمایش "در پاسخ به" -->
+                    <div class="reply-to-indicator" id="reply-to-{{ tweet.id }}" style="display: none;">
+                        <span>در پاسخ به <strong>@{{ tweet.user.username }}</strong></span>
+                        <button type="button" onclick="cancelReply({{ tweet.id }})" class="cancel-reply">×</button>
+                    </div>
+                </div>
+                <button type="submit" id="reply-btn-{{ tweet.id }}" disabled>ارسال</button>
+            </form>
+        {% else %}
+            <div style="padding: 16px; text-align: center; border-bottom: 1px solid var(--border);">
+                <a href="{% url 'login' %}" style="color: var(--primary); text-decoration: none;">برای پاسخ دادن وارد
+                    شوید</a>
+            </div>
+        {% endif %}
+
+        <!-- ریپلای‌ها -->
+        <div class="replies-section" id="replies-{{ tweet.id }}">
+            <h3 class="replies-header">ریپلای‌ها <span class="replies-count">({{ replies.count }})</span></h3>
+
+            {% for reply in replies %}
+                <div class="reply-tweet" data-reply-id="{{ reply.id }}">
+                    <a href="{% url 'user_profile' reply.user.username %}" class="reply-avatar">
+                        {% if reply.user.profile.image %}
+                            <img src="{{ reply.user.profile.image.url }}" alt="{{ reply.user.username }}">
+                        {% else %}
+                            {{ reply.user.username|make_list|first|upper }}
+                        {% endif %}
+                    </a>
+                    <div class="reply-content">
+                        <div class="reply-header">
+                            <a href="{% url 'user_profile' reply.user.username %}" class="reply-name">
+                                {{ reply.user.get_full_name|default:reply.user.username }}
+                            </a>
+                            <span class="reply-handle">@{{ reply.user.username }}</span>
+                            <span class="reply-time">· {{ reply.created_at|date:"H:i" }} · {{ reply.created_at|date:"Y/m/d" }}</span>
+                        </div>
+                        <p class="reply-text">{{ reply.content }}</p>
+
+                        <!-- اکشن‌های ریپلای -->
+                        <div class="reply-actions">
+                            <button class="action-btn reply"
+                                    onclick="showReplyForm({{ tweet.id }}, '{{ reply.user.username }}')">
+                                <span>💬</span>
+                                <span>پاسخ</span>
+                            </button>
+                            <button class="action-btn like {% if reply.user_liked %}liked{% endif %}"
+                                    onclick="toggleLike({{ reply.id }}, this)">
+                                <span>{% if reply.user_liked %}❤️{% else %}🤍{% endif %}</span>
+                                <span>{{ reply.likes_count }}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <p style="text-align: center; color: var(--gray); padding: 30px;" class="no-replies">
+                    هنوز ریپلایی وجود ندارد
+                </p>
+            {% endfor %}
+
+            <!-- دکمه بارگذاری بیشتر -->
+            {% if replies.count > 10 %}
+                <button class="load-more-replies" onclick="loadMoreReplies({{ tweet.id }})">
+                    بارگذاری بیشتر
+                </button>
+            {% endif %}
+        </div>
+    </main>
+
+    <!-- سایدبار راست -->
+    <aside class="right-sidebar"
+           style="width: 350px; padding: 20px; position: sticky; top: 0; height: 100vh; display: none;">
+    </aside>
+</div>
+
+<script>
+    // شمارش کاراکتر برای ریپلای
+    document.getElementById('reply-content-{{ tweet.id }}')?.addEventListener('input', function () {
+        const btn = document.getElementById('reply-btn-{{ tweet.id }}');
+        if (btn) btn.disabled = this.value.trim().length === 0;
+    });
+
+    // لایک
+    function toggleLike(tweetId, button) {
+        fetch(`/tweet/${tweetId}/like/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    const icon = button.querySelector('.action-icon');
+                    const count = button.querySelector('.like-count');
+                    icon.textContent = data.liked ? '❤️' : '🤍';
+                    button.classList.toggle('liked', data.liked);
+                    count.textContent = data.likes_count;
+                }
+            });
+    }
+
+    // ارسال ریپلای
+    function submitReply(event, tweetId) {
+        event.preventDefault();
+        const textarea = document.getElementById('reply-content-' + tweetId);
+        const content = textarea.value.trim();
+        if (!content) return false;
+
+        const formData = new FormData();
+        formData.append('content', content);
+
+        fetch(`/tweet/${tweetId}/comment/`, {
+            method: 'POST',
+            body: formData,
+            headers: {'X-CSRFToken': '{{ csrf_token }}'}
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    textarea.value = '';
+                    // اضافه کردن ریپلای جدید به لیست
+                    const repliesSection = document.querySelector('.replies-section');
+                    const emptyMsg = repliesSection.querySelector('p');
+                    if (emptyMsg) emptyMsg.remove();
+
+                    const replyHtml = `
+                    <div class="reply-tweet">
+                        <div class="reply-avatar">
+                            {{ user.username|make_list|first|upper }}
+                        </div>
+                        <div class="reply-content">
+                            <div class="reply-header">
+                                <span class="reply-name">{{ user.get_full_name|default:user.username }}</span>
+                                <span class="reply-handle">@{{ user.username }}</span>
+                                <span class="reply-time">· همین الان</span>
+                            </div>
+                            <p class="reply-text">${content}</p>
+                        </div>
+                    </div>
+                `;
+                    repliesSection.insertAdjacentHTML('beforeend', replyHtml);
+
+                    // آپدیت تعداد
+                    const replyCount = document.querySelector('.stat-item strong');
+                    replyCount.textContent = parseInt(replyCount.textContent) + 1;
+                }
+            });
+
+        return false;
+    }
+</script>
+</body>
+</html>
