@@ -1,0 +1,2 @@
+Looking in indexes: https://mirror-pypi.runflare.com/simple
+Requirement already satisfied: pip in /home/delta/PycharmProjects/Twitter/myenv/lib/python3.11/site-packages (23.2)

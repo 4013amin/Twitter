@@ -1,0 +1,76 @@
+<!-- followers_list.html -->
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <!-- هدر -->
+            <div class="profile-tabs mb-4">
+                <a href="{% url 'followers_list' profile_user.username %}"
+                   class="tab {% if type == 'followers' %}active{% endif %}">
+                    فالوورها ({{ followers.count }})
+                </a>
+                <a href="{% url 'following_list' profile_user.username %}"
+                   class="tab {% if type == 'following' %}active{% endif %}">
+                    فالوینگ ({{ following.count }})
+                </a>
+            </div>
+
+            <!-- لیست -->
+            <div class="follow-list">
+                {% if type == 'followers' %}
+                    {% for follow in followers %}
+                        {% with user=follow.follower %}
+                            {% include 'profile/user_card.html' with user=user %}
+                        {% endwith %}
+                    {% endfor %}
+                {% else %}
+                    {% for follow in following %}
+                        {% with user=follow.following %}
+                            {% include 'profile/user_card.html' with user=user %}
+                        {% endwith %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <!-- صفحه‌بندی -->
+            {% if followers.has_other_pages or following.has_other_pages %}
+                <nav>
+                    <ul class="pagination">
+                        {% if followers.has_previous or following.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1">اول</a>
+                            </li>
+                        {% endif %}
+
+                        {% if followers.has_previous or following.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={% if type == 'followers' %}{{ followers.previous_page_number }}{% else %}{{ following.previous_page_number }}{% endif %}">
+                                    قبلی
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        <li class="page-item active">
+                            <span class="page-link">
+                                {% if type == 'followers' %}{{ followers.number }}{% else %}{{ following.number }}{% endif %}
+                            </span>
+                        </li>
+
+                        {% if followers.has_next or following.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={% if type == 'followers' %}{{ followers.next_page_number }}{% else %}{{ following.next_page_number }}{% endif %}">
+                                    بعدی
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

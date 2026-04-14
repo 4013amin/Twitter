@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تأیید حذف حساب - Twitter Clone</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f7f9f9;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 { font-size: 20px; margin-bottom: 12px; }
+        p { color: #536471; margin-bottom: 24px; font-size: 14px; }
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #cfd9de;
+            border-radius: 8px;
+            font-size: 20px;
+            text-align: center;
+            letter-spacing: 10px;
+            margin-bottom: 20px;
+        }
+        input:focus { outline: none; border-color: #1da1f2; }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 20px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-danger { background: #f4212e; color: white; }
+        .btn-danger:hover { opacity: 0.9; }
+        .btn-secondary { background: white; border: 1px solid #cfd9de; color: #0f1419; margin-top: 10px; }
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+        .alert-error { background: rgba(244, 33, 46, 0.1); color: #f4212e; border: 1px solid #f4212e; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>حذف حساب کاربری</h1>
+        <p>کد ارسال شده به شماره تماس خود را وارد کنید</p>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            <input type="text" name="code" placeholder="000000" maxlength="6" required>
+            <button type="submit" class="btn btn-danger">حذف حساب</button>
+        </form>
+
+        <a href="{% url 'profile' %}">
+            <button class="btn btn-secondary">انصراف</button>
+        </a>
+    </div>
+</body>
+</html>

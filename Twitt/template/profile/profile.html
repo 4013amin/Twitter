@@ -1,0 +1,1509 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ profile.name }} - Twitter Clone</title>
+    <style>
+        /* متغیرهای رنگی */
+        :root {
+            --primary: #1d9bf0;
+            --primary-hover: #1a8cd8;
+            --text: #0f1419;
+            --gray: #536471;
+            --light-gray: #eff3f4;
+            --border: #cfd9de;
+            --like: #f91880;
+            --retweet: #00ba7c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #fff;
+            color: var(--text);
+        }
+
+        .layout {
+            display: flex;
+            max-width: 1260px;
+            margin: 0 auto;
+        }
+
+        /* ============================================
+           سایدبار چپ
+           نیاز به: لیست navigation items
+           ============================================ */
+        .sidebar {
+            width: 275px;
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            border-left: 1px solid var(--border);
+        }
+
+        .logo {
+            font-size: 28px;
+            color: var(--primary);
+            margin-bottom: 25px;
+            padding: 10px;
+            display: inline-block;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin: 5px 0;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text);
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .nav-item:hover {
+            background: var(--light-gray);
+        }
+
+        .nav-item.active {
+            font-weight: 700;
+        }
+
+        .nav-item span {
+            margin-right: 20px;
+        }
+
+        .tweet-btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            padding: 15px;
+            font-size: 17px;
+            font-weight: 700;
+            margin-top: 20px;
+            cursor: pointer;
+            width: 90%;
+            transition: background 0.2s;
+        }
+
+        .tweet-btn:hover {
+            background: var(--primary-hover);
+        }
+
+        /* ============================================
+           فید اصلی
+           ============================================ */
+        .main {
+            flex: 1;
+            max-width: 600px;
+            border-left: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            min-height: 100vh;
+        }
+
+        /* ============================================
+           هدر پروفایل
+           نیاز به: profile.name, tweets_count
+           ============================================ */
+        .profile-header {
+            position: sticky;
+            top: 0;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .back-btn {
+            font-size: 18px;
+            text-decoration: none;
+            color: var(--text);
+        }
+
+        .profile-header-info h1 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .profile-header-info span {
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        /* ============================================
+           کاور پروفایل
+           نیاز به: profile.cover (تصویر کاور)
+           ============================================ */
+        .cover {
+            height: 200px;
+            background: linear-gradient(135deg, #1da1f2 0%, #0d8bd9 100%);
+            position: relative;
+        }
+
+        .cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* ============================================
+           اطلاعات پروفایل
+           نیاز به: profile.image, profile.name, profile.bio,
+                     profile.created_at, following_count, followers_count
+           ============================================ */
+        .profile-info {
+            padding: 0 15px 15px;
+            position: relative;
+        }
+
+        .profile-avatar {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 4px solid #fff;
+            background: var(--primary);
+            position: absolute;
+            top: -70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 48px;
+            font-weight: 700;
+            overflow: hidden;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* دکمه‌های اکشن */
+        .profile-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 12px;
+            margin-bottom: 10px;
+        }
+
+        .edit-btn, .follow-btn {
+            padding: 8px 20px;
+            border-radius: 18px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .edit-btn {
+            background: #fff;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .edit-btn:hover {
+            background: var(--light-gray);
+        }
+
+        .follow-btn {
+            background: var(--text);
+            border: none;
+            color: #fff;
+        }
+
+        .follow-btn:hover {
+            opacity: 0.9;
+        }
+
+        .follow-btn.following {
+            background: #fff;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        /* جزئیات پروفایل */
+        .profile-details {
+            margin-top: 50px;
+        }
+
+        .profile-name {
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .profile-handle {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .profile-bio {
+            font-size: 15px;
+            margin: 12px 0;
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+
+        .profile-meta {
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 12px;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+        }
+
+        .profile-stats a {
+            text-decoration: none;
+            color: var(--gray);
+        }
+
+        .profile-stats a:hover {
+            text-decoration: underline;
+        }
+
+        .profile-stats strong {
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        /* ============================================
+           تب‌های پروفایل
+           نیاز به: active_tab برای هایلایت تب فعال
+           ============================================ */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 16px;
+            text-align: center;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--gray);
+            cursor: pointer;
+            position: relative;
+            transition: background 0.2s;
+            text-decoration: none;
+        }
+
+        .tab:hover {
+            background: var(--light-gray);
+        }
+
+        .tab.active {
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        /* ============================================
+           لیست توییت‌ها
+           نیاز به: tweets (لیست توییت‌ها با فیلتر بر اساس تب)
+           ============================================ */
+        .tweets {
+        }
+
+        .tweet {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .tweet:hover {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .tweet-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+            font-size: 18px;
+            overflow: hidden;
+            flex-shrink: 0;
+            text-decoration: none;
+        }
+
+        .tweet-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .tweet-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .tweet-header {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 4px;
+            flex-wrap: wrap;
+        }
+
+        .tweet-name {
+            font-weight: 700;
+            font-size: 15px;
+            text-decoration: none;
+            color: var(--text);
+        }
+
+        .tweet-handle, .tweet-time {
+            color: var(--gray);
+            font-size: 15px;
+        }
+
+        .tweet-text {
+            font-size: 15px;
+            line-height: 1.5;
+            margin-bottom: 12px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .tweet-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            margin-bottom: 12px;
+        }
+
+        .tweet-actions {
+            display: flex;
+            justify-content: space-between;
+            max-width: 425px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--gray);
+            font-size: 13px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .action-btn:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .action-btn.reply:hover {
+            color: var(--primary);
+        }
+
+        .action-btn.retweet:hover {
+            color: var(--retweet);
+        }
+
+        .action-btn.like:hover {
+            color: var(--like);
+        }
+
+        .action-btn.like.liked {
+            color: var(--like);
+        }
+
+        /* ============================================
+           بخش کامنت‌ها
+           نیاز به: tweet.comments (لیست کامنت‌ها)
+           ============================================ */
+        .comments-section {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+            display: none;
+        }
+
+        .comments-section.active {
+            display: block;
+        }
+
+        .comment-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            align-items: center;
+        }
+
+        .comment-form .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .comment-form input {
+            flex: 1;
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 14px;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .comment-form input:focus {
+            border-color: var(--primary);
+        }
+
+        .comment-form button {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .comment-form button:hover {
+            background: var(--primary-hover);
+        }
+
+        .comment-list {
+        }
+
+        .comment {
+            display: flex;
+            gap: 10px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .comment-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+            font-size: 14px;
+            flex-shrink: 0;
+            text-decoration: none;
+        }
+
+        .comment-content {
+            flex: 1;
+        }
+
+        .comment-header {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 4px;
+            flex-wrap: wrap;
+        }
+
+        .comment-name {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .comment-username, .comment-time {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .comment-text {
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        /* ============================================
+           سایدبار راست
+           نیاز به: trends (لیست ترندها)
+           ============================================ */
+        .right-sidebar {
+            width: 350px;
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: none;
+        }
+
+        @media (min-width: 1024px) {
+            .right-sidebar {
+                display: block;
+            }
+        }
+
+        .search-box {
+            background: var(--light-gray);
+            border-radius: 30px;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            background: none;
+            border: none;
+            outline: none;
+            font-size: 15px;
+            width: 100%;
+            font-family: inherit;
+        }
+
+        .trends-box {
+            background: #f7f9f9;
+            border-radius: 16px;
+            padding: 16px;
+        }
+
+        .trends-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .trend-item {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+        }
+
+        .trend-item:last-child {
+            border-bottom: none;
+        }
+
+        .trend-category {
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        .trend-name {
+            font-weight: 700;
+            font-size: 15px;
+            margin: 2px 0;
+        }
+
+        .trend-count {
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        /* ============================================
+           حالت خالی
+           ============================================ */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: var(--gray);
+            font-size: 15px;
+        }
+
+        /* ============================================
+           ریسپانسیو
+           ============================================ */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 88px;
+                padding: 10px;
+            }
+
+            .sidebar .nav-item span,
+            .sidebar .tweet-btn span {
+                display: none;
+            }
+
+            .sidebar .tweet-btn {
+                width: 50px;
+                height: 50px;
+                padding: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 22px;
+            }
+
+            .main {
+                max-width: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main {
+                border: none;
+            }
+
+            .tweet {
+                padding: 12px;
+            }
+
+            .cover {
+                height: 120px;
+            }
+
+            .profile-avatar {
+                width: 90px;
+                height: 90px;
+                top: -45px;
+                font-size: 32px;
+            }
+
+            .profile-details {
+                margin-top: 55px;
+            }
+        }
+
+        /* لودینگ */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--gray);
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--light-gray);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="layout">
+    <!-- سایدبار چپ -->
+    <aside class="sidebar">
+        <a href="/" class="logo">𝕏</a>
+        <nav>
+            <ul class="nav-menu">
+                <!-- ============================================
+                     نیاز به: لیست آیتم‌های منو
+                     مثال:
+                     [
+                         {'icon': '🏠', 'text': 'خانه', 'url': '/', 'active': False},
+                         {'icon': '🔍', 'text': 'جستجو', 'url': '/search/', 'active': False},
+                         ...
+                     ]
+                     ============================================ -->
+                <li><a href="/" class="nav-item">🏠 <span>خانه</span></a></li>
+                <li><a href="#" class="nav-item">🔍 <span>جستجو</span></a></li>
+                <li><a href="#" class="nav-item">🔔 <span>اعلانات</span></a></li>
+                <li><a href="#" class="nav-item">✉️ <span>پیام‌ها</span></a></li>
+                <li><a href="{% url 'profile' %}" class="nav-item active">👤 <span>پروفایل</span></a></li>
+            </ul>
+        </nav>
+
+        {% if user.is_authenticated %}
+            <button class="tweet-btn" onclick="document.querySelector('.composer textarea').focus()">توییت</button>
+            <form method="POST" action="{% url 'logout' %}" style="margin-top: auto;">
+                {% csrf_token %}
+                <button type="submit" class="nav-item"
+                        style="width: 100%; border: none; background: none; text-align: right;">
+                    🚪 <span>خروج</span>
+                </button>
+            </form>
+        {% else %}
+            <a href="{% url 'request_otp' %}" class="tweet-btn">ورود</a>
+        {% endif %}
+    </aside>
+
+    <!-- فید اصلی -->
+    <main class="main">
+        <!-- هدر پروفایل -->
+        <!-- ============================================
+             نیاز به داده‌های زیر از بک‌اند:
+             - profile.name: نام کاربر
+             - tweets_count: تعداد توییت‌های کاربر
+             ============================================ -->
+        <header class="profile-header">
+            <a href="{% url 'home' %}" class="back-btn">←</a>
+            <div class="profile-header-info">
+                <h1>{{ profile.name }}</h1>
+                <span>{{ tweets_count|default:0 }} پست</span>
+            </div>
+        </header>
+
+        <!-- کاور پروفایل -->
+        <!-- ============================================
+             نیاز به داده‌های زیر از بک‌اند:
+             - profile.cover: تصویر کاور پروفایل (اختیاری)
+             اگر تصویر وجود نداشت، از رنگ gradient استفاده شود
+             ============================================ -->
+        <div class="cover">
+            {% if profile.cover %}
+                <img src="{{ profile.cover.url }}" alt="کاور پروفایل">
+            {% endif %}
+        </div>
+
+        <!-- اطلاعات پروفایل -->
+        <!-- ============================================
+             نیاز به داده‌های زیر از بک‌اند:
+             - profile.image: تصویر آواتار
+             - profile.name: نام نمایشی
+             - profile.bio: بیوگرافی
+             - profile.created_at: تاریخ عضویت
+             - following_count: تعداد افرادی که این کاربر دنبال می‌کند
+             - followers_count: تعداد دنبال‌کنندگان
+             - is_following: آیا کاربر جاری این پروفایل را دنبال کرده
+             - request.user == profile_user: آیا این پروفایل متعلق به کاربر جاری است
+             ============================================ -->
+        <div class="profile-info">
+            <div class="profile-avatar">
+                {% if profile.image and profile.image.name != 'default.jpg' %}
+                    <img src="{{ profile.image.url }}" alt="{{ profile.name }}">
+                {% else %}
+                    {{ profile.name|make_list|first|upper }}
+                {% endif %}
+            </div>
+            <div class="profile-actions">
+                {% if request.user == profile_user %}
+                    <a href="{% url 'edit_profile' %}" class="edit-btn">ویرایش پروفایل</a>
+                {% else %}
+                    <button class="follow-btn {% if is_following %}following{% endif %}"
+                            id="profileFollowBtn"
+                            data-user-id="{{ profile_user.id }}"
+                            data-is-following="{% if is_following %}true{% else %}false{% endif %}"
+                            onclick="handleProfileFollow(this)">
+                        {% if is_following %}
+                            <span><i class="fas fa-user-minus"></i> آنفالو</span>
+                        {% else %}
+                            <span><i class="fas fa-user-plus"></i> فالو</span>
+                        {% endif %}
+                    </button>
+                {% endif %}
+            </div>
+
+            <div class="profile-details">
+                <div class="profile-name">{{ profile.name }}</div>
+                <div class="profile-handle">@{{ profile_user.username }}</div>
+
+                {% if profile.bio %}
+                    <div class="profile-bio">{{ profile.bio }}</div>
+                {% endif %}
+
+                <div class="profile-meta">
+                    <span>📅 عضویت از {{ profile.created_at|date:"F Y" }}</span>
+                </div>
+
+                <div class="profile-stats">
+                    <span><strong>{{ following_count|default:0 }}</strong> دنبال شده</span>
+                    <a href="#" onclick="showFollowers('{{ profile_user.username }}')">
+                        <strong>{{ followers_count|default:0 }}</strong> دنبال‌کننده
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- تب‌های پروفایل -->
+        <!-- ============================================
+             نیاز به داده‌های زیر از بک‌اند:
+             - active_tab: تب فعال ('posts', 'replies', 'media', 'likes')
+
+             برای هر تب، بک‌اند باید فیلتر مناسب را اعمال کند:
+             - posts: همه توییت‌های کاربر
+             - replies: فقط توییت‌هایی که reply به کسی هستند
+             - media: توییت‌های دارای تصویر یا ویدیو
+             - likes: توییت‌هایی که کاربر لایک کرده
+
+             مثال URL:
+             /profile/username/?tab=replies
+             /profile/username/?tab=media
+             ============================================ -->
+        <div class="tabs">
+            <a href="?tab=posts"
+               class="tab {% if active_tab == 'posts' or not active_tab %}active{% endif %}">پست‌ها</a>
+            <a href="?tab=replies" class="tab {% if active_tab == 'replies' %}active{% endif %}">پاسخ‌ها</a>
+            <a href="?tab=likes" class="tab {% if active_tab == 'likes' %}active{% endif %}">لایک‌ها</a>
+        </div>
+
+        <!-- لیست توییت‌ها -->
+        <!-- ============================================
+             نیاز به داده‌های زیر از بک‌اند:
+             - tweets: لیست توییت‌ها (QuerySet)
+
+             هر توییت باید شامل فیلدهای زیر باشد:
+             - id: شناسه توییت
+             - content: متن توییت
+             - created_at: تاریخ ایجاد
+             - image: تصویر (اختیاری)
+             - video: ویدیو (اختیاری)
+             - voice: صدا (اختیاری)
+             - likes_count: تعداد لایک
+             - comments_count: تعداد کامنت
+             - retweets_count: تعداد ریتوییت
+             - user_liked: آیا کاربر جاری لایک کرده
+             - user_retweeted: آیا کاربر جاری ریتوییت کرده
+             - author: نویسنده توییت (برای نمایش آواتار و نام)
+             - comments: لیست کامنت‌ها (برای نمایش زیر هر توییت)
+
+             برای صفحه‌بندی:
+             - has_next: آیا صفحه بعدی وجود دارد
+             - has_previous: آیا صفحه قبلی وجود دارد
+             - next_page_number: شماره صفحه بعد
+             - previous_page_number: شماره صفحه قبل
+             ============================================ -->
+        <div class="tweets" id="tweets-container">
+            {% for tweet in tweets %}
+                <article class="tweet" data-tweet-id="{{ tweet.id }}">
+                    <a href="{% url 'user_profile' tweet.author.username %}" class="tweet-avatar">
+                        {% if tweet.author.profile.image and tweet.author.profile.image.name != 'default.jpg' %}
+                            <img src="{{ tweet.author.profile.image.url }}" alt="{{ tweet.author.get_full_name }}">
+                        {% else %}
+                            {{ tweet.auth
+                                    r.username|make_list|first|upper }}
+                        {% endif %}
+                    </a>
+                    <div class="tweet-content">
+                        <div class="tweet-header">
+                            <a href="{% url 'user_profile' tweet.author.username %}" class="tweet-name">
+                                {{ tweet.author.get_full_name|default:tweet.author.username }}
+                            </a>
+                            <span class="tweet-handle">@{{ tweet.author.username }}</span>
+                            <span class="tweet-time">· {{ tweet.created_at|date:"H:i" }} · {{ tweet.created_at|date:"Y/m/d" }}</span>
+                        </div>
+
+                        <p class="tweet-text">{{ tweet.content }}</p>
+
+                        <!-- تصویر -->
+                        {% if tweet.image %}
+                            <img src="{{ tweet.image.url }}" alt="تصویر" class="tweet-image">
+                        {% endif %}
+
+                        <!-- ویدیو -->
+                        {% if tweet.video %}
+                            <video class="tweet-image" controls preload="metadata">
+                                <source src="{{ tweet.video.url }}" type="video/mp4">
+                                مرورگر شما از پخش ویدیو پشتیبانی نمی‌کند
+                            </video>
+                        {% endif %}
+
+                        <!-- صدا/ویس -->
+                        {% if tweet.voice %}
+                            <div class="tweet-voice" style="margin-bottom: 12px;">
+                                <audio controls style="width: 100%; border-radius: 12px;">
+                                    <source src="{{ tweet.voice.url }}" type="audio/mpeg">
+                                    مرورگر شما از پخش صدا پشتیبانی نمی‌کند
+                                </audio>
+                            </div>
+                        {% endif %}
+
+                        <!-- اکشن‌های توییت -->
+                        <div class="tweet-actions">
+                            <!-- پاسخ -->
+                            <button class="action-btn reply" onclick="toggleComments({{ tweet.id }})">
+                                <span>💬</span>
+                                <span>{{ tweet.comments_count|default:0 }}</span>
+                            </button>
+
+                            <!-- ریتوییت -->
+                            <button class="action-btn retweet {% if tweet.user_retweeted %}active{% endif %}"
+                                    onclick="toggleRetweet({{ tweet.id }})">
+                                <span>🔁</span>
+                                <span>{{ tweet.retweets_count|default:0 }}</span>
+                            </button>
+
+                            <!-- لایک -->
+                            {% if user.is_authenticated %}
+                                <button class="action-btn like {% if tweet.user_liked %}liked{% endif %}"
+                                        data-tweet-id="{{ tweet.id }}"
+                                        onclick="toggleLike({{ tweet.id }}, this)">
+                                    <span>{% if tweet.user_liked %}❤️{% else %}🤍{% endif %}</span>
+                                    <span class="like-count">{{ tweet.likes_count|default:0 }}</span>
+                                </button>
+                            {% else %}
+                                <a href="{% url 'request_otp' %}" class="action-btn like">
+                                    <span>🤍</span>
+                                    <span>{{ tweet.likes_count|default:0 }}</span>
+                                </a>
+                            {% endif %}
+
+                            <!-- اشتراک‌گذاری -->
+                            <button class="action-btn share" onclick="shareTweet({{ tweet.id }})">
+                                <span>📤</span>
+                            </button>
+                        </div>
+
+                        <!-- کامنت‌ها -->
+                        <!-- ============================================
+                             نیاز به: لیست کامنت‌ها برای هر توییت
+
+                             هر کامنت باید شامل:
+                             - id: شناسه کامنت
+                             - content: متن کامنت
+                             - created_at: تاریخ
+                             - user: نویسنده کامنت
+                             ============================================ -->
+                        <div class="comments-section" id="comments-{{ tweet.id }}">
+                            {% if user.is_authenticated %}
+                                <form class="comment-form" onsubmit="return submitComment(event, {{ tweet.id }})">
+                                    {% csrf_token %}
+                                    <div class="avatar">
+                                        {{ user.username|make_list|first|upper }}
+                                    </div>
+                                    <input type="text" name="content" placeholder="نظر خود را بنویسید..." required>
+                                    <button type="submit">ارسال</button>
+                                </form>
+                            {% endif %}
+
+                            <div class="comment-list" id="comment-list-{{ tweet.id }}">
+                                {% for comment in tweet.comments.all|slice:":5" %}
+                                    <div class="comment" data-comment-id="{{ comment.id }}">
+                                        <a href="{% url 'user_profile' comment.user.username %}" class="comment-avatar">
+                                            {{ comment.user.username|make_list|first|upper }}
+                                        </a>
+                                        <div class="comment-content">
+                                            <div class="comment-header">
+                                                <span class="comment-name">{{ comment.user.get_full_name|default:comment.user.username }}</span>
+                                                <span class="comment-username">@{{ comment.user.username }}</span>
+                                                <span class="comment-time">· {{ comment.created_at|date:"H:i" }}</span>
+                                            </div>
+                                            <p class="comment-text">{{ comment.content }}</p>
+                                        </div>
+                                        {% if user.is_authenticated and comment.user == user %}
+                                            <button class="action-btn"
+                                                    onclick="deleteComment({{ tweet.id }}, {{ comment.id }})"
+                                                    title="حذف">
+                                                🗑️
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                {% empty %}
+                                    <p style="text-align: center; color: var(--gray); padding: 15px; font-size: 14px;">
+                                        هنوز کامنتی وجود ندارد
+                                    </p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="empty-state">
+                    <h2>{% if active_tab == 'likes' %}هنوز لایکی ندارید{% else %}هنوز پستی وجود ندارد{% endif %}</h2>
+                    <p>{% if active_tab == 'likes' %}توییت‌هایی که لایک کرده‌اید اینجا نمایش داده می‌شوند{% else %}این
+                        کاربر هنوز توییتی منتشر نکرده است{% endif %}</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- لودینگ برای صفحه‌بندی -->
+        {% if tweets.has_next %}
+            <div class="loading" id="loading-more">
+                <div class="loading-spinner"></div>
+                <p>در حال بارگذاری...</p>
+            </div>
+        {% endif %}
+    </main>
+
+    <!-- سایدبار راست -->
+    <!-- ============================================
+         نیاز به داده‌های زیر از بک‌اند:
+         - trends: لیست ترندها
+
+         هر ترند باید شامل:
+         - name: نام ترند
+         - category: دسته‌بندی
+         - tweet_count: تعداد توییت
+         ============================================ -->
+    <!-- سایدبار راست -->
+    <aside class="right-sidebar">
+        <div class="search-box">
+            <input type="text" placeholder="جستجو در توییتر">
+        </div>
+
+        <div class="trends-box">
+            <h3 class="trends-title">ترندها</h3>
+
+            {% if trends %}
+                {% for trend in trends|slice:":5" %}
+                    <div class="trend-item" onclick="searchTrend('{{ trend.name }}')">
+                        <div class="trend-category">{{ trend.category|default:"ترند" }}</div>
+                        <div class="trend-name">{{ trend.name }}</div>
+                        <div class="trend-count">{{ trend.tweet_count|default:"0" }} توییت</div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <!-- داده‌های پیش‌فرض -->
+                <div class="trend-item">
+                    <div class="trend-category">در حال پیگیری</div>
+                    <div class="trend-name">#برنامه_نویسی</div>
+                    <div class="trend-count">۲۴.۵K توییت</div>
+                </div>
+                <div class="trend-item">
+                    <div class="trend-category">فناوری</div>
+                    <div class="trend-name">#هوش_مصنوعی</div>
+                    <div class="trend-count">۱۸.۲K توییت</div>
+                </div>
+                <div class="trend-item">
+                    <div class="trend-category">ورزش</div>
+                    <div class="trend-name">#فوتبال</div>
+                    <div class="trend-count">۵۶.۷K توییت</div>
+                </div>
+            {% endif %}
+        </div>
+    </aside>
+</div>
+
+<script>
+    // ========== Follow/Unfollow برای پروفایل ==========
+    function handleProfileFollow(button) {
+        if (button.disabled) return;
+        button.disabled = true;
+
+        const userId = button.dataset.userId;
+        const isFollowing = button.dataset.isFollowing === 'true';
+
+        const url = isFollowing
+            ? `/unfollow/${userId}/`
+            : `/follow/${userId}/`;
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest',
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // آپدیت دکمه
+                    if (data.is_following) {
+                        button.innerHTML = '<span><i class="fas fa-user-minus"></i> آنفالو</span>';
+                        button.classList.add('following');
+                        button.dataset.isFollowing = 'true';
+                    } else {
+                        button.innerHTML = '<span><i class="fas fa-user-plus"></i> فالو</span>';
+                        button.classList.remove('following');
+                        button.dataset.isFollowing = 'false';
+                    }
+
+                    // آپدیت تعداد فالوورها
+                    const followersEl = document.querySelector('.profile-stats a strong');
+                    if (followersEl && data.followers_count !== undefined) {
+                        followersEl.textContent = data.followers_count;
+                    }
+
+                    showToast(data.message);
+                } else {
+                    // مدیریت خطاها
+                    if (data.error) {
+                        if (data.error.includes('قبلاً') || data.error.includes('نکرده')) {
+                            // اگه وضعیت نامشخص بود، دکمه رو درست آپدیت کن
+                            if (data.error.includes('قبلاً')) {
+                                button.innerHTML = '<span><i class="fas fa-user-minus"></i> آنفالو</span>';
+                                button.classList.add('following');
+                                button.dataset.isFollowing = 'true';
+                            } else {
+                                button.innerHTML = '<span><i class="fas fa-user-plus"></i> فالو</span>';
+                                button.classList.remove('following');
+                                button.dataset.isFollowing = 'false';
+                            }
+                        }
+                    }
+                    showToast(data.error || 'خطایی رخ داد', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('خطای شبکه', 'error');
+            })
+            .finally(() => {
+                button.disabled = false;
+            });
+    }
+
+    // ========== توییت‌ها ==========
+    function goToTweetDetail(tweetId, event) {
+        if (event.target.closest('.action-btn') || event.target.closest('.comment-form') || event.target.closest('form') || event.target.closest('img')) return;
+        window.location.href = '/tweet/' + tweetId + '/';
+    }
+
+    function updateCharCount(textarea) {
+        const maxLength = 280;
+        const currentLength = textarea.value.length;
+        const charCount = document.getElementById('charCount');
+        const postBtn = document.getElementById('post-btn');
+        charCount.textContent = maxLength - currentLength;
+        if (currentLength > 0 || audioBlob || document.getElementById('tweet-image').files.length > 0 || document.getElementById('tweet-video').files.length > 0) {
+            postBtn.disabled = false;
+            charCount.style.color = currentLength > 260 ? (currentLength > 275 ? '#f91880' : '#ffad1f') : 'var(--gray)';
+        } else {
+            postBtn.disabled = true;
+            charCount.style.color = 'var(--gray)';
+        }
+    }
+
+    function toggleComments(tweetId) {
+        const section = document.getElementById('comments-' + tweetId);
+        section.classList.toggle('active');
+        if (section.classList.contains('active')) {
+            const input = document.getElementById('comment-input-' + tweetId);
+            if (input) input.focus();
+        }
+    }
+
+    function deleteComment(tweetId, commentId) {
+        if (!confirm('حذف شود؟')) return;
+        const formData = new FormData();
+        formData.append('comment_id', commentId);
+        fetch(`/tweet/${tweetId}/delete_comment/`, {
+            method: 'POST',
+            body: formData,
+            headers: {'X-CSRFToken': '{{ csrf_token }}'}
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    const comment = document.querySelector(`#comment-list-${tweetId} [data-comment-id="${commentId}"]`);
+                    if (comment) comment.remove();
+                    const replyBtn = document.querySelector(`.reply[onclick*="${tweetId}"]`);
+                    if (replyBtn) {
+                        const count = replyBtn.querySelector('span:last-child');
+                        count.textContent = parseInt(count.textContent) - 1;
+                    }
+                }
+            });
+    }
+
+    function toggleLike(tweetId, button) {
+        fetch(`/tweet/${tweetId}/like/`, {
+            method: 'POST',
+            headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json'}
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    const icon = button.querySelector('.action-icon');
+                    const count = button.querySelector('.like-count');
+                    icon.textContent = data.liked ? '❤️' : '🤍';
+                    button.classList.toggle('liked', data.liked);
+                    count.textContent = data.likes_count;
+                }
+            });
+    }
+
+    function submitComment(event, tweetId) {
+        event.preventDefault();
+        const form = event.target;
+        const input = form.querySelector('input[name="content"]');
+        const content = input.value.trim();
+        if (!content) return false;
+        const formData = new FormData();
+        formData.append('content', content);
+        fetch(`/tweet/${tweetId}/comment/`, {
+            method: 'POST',
+            body: formData,
+            headers: {'X-CSRFToken': '{{ csrf_token }}'}
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    input.value = '';
+                    const btn = document.getElementById('comment-btn-' + tweetId);
+                    if (btn) btn.disabled = true;
+                    addNewComment(tweetId, data.comment);
+                }
+            });
+        return false;
+    }
+
+    function addNewComment(tweetId, comment) {
+        const commentList = document.getElementById('comment-list-' + tweetId);
+        const emptyMsg = commentList.querySelector('p');
+        if (emptyMsg) emptyMsg.remove();
+        const commentHtml = `<div class="comment" data-comment-id="${comment.id}">
+            <div class="comment-avatar">${comment.username.charAt(0).toUpperCase()}</div>
+            <div class="comment-content">
+                <div class="comment-header">
+                    <span class="comment-name">${comment.user_name || comment.username}</span>
+                    <span class="comment-username">@${comment.username}</span>
+                    <span class="comment-time">· همین الان</span>
+                </div>
+                <p class="comment-text">${comment.content}</p>
+            </div>
+        </div>`;
+        commentList.insertAdjacentHTML('afterbegin', commentHtml);
+        const replyBtn = document.querySelector(`.reply[onclick*="${tweetId}"]`);
+        if (replyBtn) {
+            const count = replyBtn.querySelector('span:last-child');
+            count.textContent = parseInt(count.textContent) + 1;
+        }
+    }
+
+    function shareTweet(tweetId) {
+        const url = window.location.origin + '/tweet/' + tweetId + '/';
+        if (navigator.share) {
+            navigator.share({title: 'توییت', url: url});
+        } else {
+            navigator.clipboard.writeText(url).then(() => {
+                alert('لینک کپی شد!');
+            });
+        }
+    }
+
+    // ========== ضبط صدا ==========
+    let audioBlob = null;
+    let mediaRecorder, audioChunks = [], recordingInterval, recordingSeconds = 0;
+
+    function previewMedia(input, type) {
+        const file = input.files[0];
+        if (!file) return;
+        const previewContainer = document.getElementById('media-preview');
+        const imageContainer = document.getElementById('image-preview-container');
+        const videoContainer = document.getElementById('video-preview-container');
+        const voiceContainer = document.getElementById('voice-preview-container');
+
+        imageContainer.style.display = 'none';
+        videoContainer.style.display = 'none';
+        voiceContainer.style.display = 'none';
+
+        if (type === 'image') {
+            document.getElementById('tweet-video').value = '';
+            document.getElementById('tweet-voice').value = '';
+            audioBlob = null;
+        } else if (type === 'video') {
+            document.getElementById('tweet-image').value = '';
+            document.getElementById('tweet-voice').value = '';
+            audioBlob = null;
+        } else if (type === 'voice') {
+            document.getElementById('tweet-image').value = '';
+            document.getElementById('tweet-video').value = '';
+        }
+
+        if (type === 'image') {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('image-preview').src = e.target.result;
+                imageContainer.style.display = 'block';
+                previewContainer.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        } else if (type === 'video') {
+            const url = URL.createObjectURL(file);
+            document.getElementById('video-preview').src = url;
+            videoContainer.style.display = 'block';
+            previewContainer.style.display = 'block';
+        } else if (type === 'voice') {
+            const url = URL.createObjectURL(file);
+            document.getElementById('voice-preview').src = url;
+            voiceContainer.style.display = 'block';
+            previewContainer.style.display = 'block';
+        }
+    }
+
+    function removeMedia(type) {
+        if (type === 'image') {
+            document.getElementById('tweet-image').value = '';
+            document.getElementById('image-preview-container').style.display = 'none';
+        } else if (type === 'video') {
+            document.getElementById('tweet-video').value = '';
+            document.getElementById('video-preview-container').style.display = 'none';
+        } else if (type === 'voice') {
+            document.getElementById('tweet-voice').value = '';
+            document.getElementById('voice-preview-container').style.display = 'none';
+            audioBlob = null;
+        }
+    }
+
+    // ========== فالو/آنفالو در لیست توییت‌ها ==========
+    function initFollowButtons() {
+        const followButtons = document.querySelectorAll('.follow-btn');
+        followButtons.forEach(button => {
+            button.addEventListener('click', function (e) {
+                e.stopPropagation();
+                const userId = this.dataset.userId;
+                const currentAction = this.dataset.action;
+
+                if (this.disabled) return;
+                this.disabled = true;
+
+                const url = currentAction === 'follow'
+                    ? `/follow/${userId}/`
+                    : `/unfollow/${userId}/`;
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            if (data.is_following) {
+                                this.innerHTML = '<i class="fas fa-user-minus"></i> آنفالو';
+                                this.classList.remove('btn-primary');
+                                this.classList.add('btn-outline-danger');
+                                this.dataset.action = 'unfollow';
+                            } else {
+                                this.innerHTML = '<i class="fas fa-user-plus"></i> فالو';
+                                this.classList.remove('btn-outline-danger');
+                                this.classList.add('btn-primary');
+                                this.dataset.action = 'follow';
+                            }
+                            showToast(data.message);
+                        } else {
+                            if (data.error && data.error.includes('قبلاً')) {
+                                this.innerHTML = '<i class="fas fa-user-minus"></i> آنفالو';
+                                this.classList.remove('btn-primary');
+                                this.classList.add('btn-outline-danger');
+                                this.dataset.action = 'unfollow';
+                            }
+                            if (data.error && data.error.includes('نکرده')) {
+                                this.innerHTML = '<i class="fas fa-user-plus"></i> فالو';
+                                this.classList.remove('btn-outline-danger');
+                                this.classList.add('btn-primary');
+                                this.dataset.action = 'follow';
+                            }
+                            showToast(data.error || 'خطایی رخ داد', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('خطای شبکه', 'error');
+                    })
+                    .finally(() => {
+                        this.disabled = false;
+                    });
+            });
+        });
+    }
+
+    // ========== Toast Notification ==========
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: ${type === 'error' ? '#f91880' : '#00ba7c'};
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 10000;
+            animation: toastFadeIn 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        `;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.animation = 'toastFadeOut 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    // ========== Initialize ==========
+    document.addEventListener('DOMContentLoaded', function () {
+        initFollowButtons();
+
+        // کامنت فرم‌ها
+        document.querySelectorAll('.comment-form input').forEach(input => {
+            input.addEventListener('input', function () {
+                const tweetId = this.id.replace('comment-input-', '');
+                const btn = document.getElementById('comment-btn-' + tweetId);
+                if (btn) btn.disabled = this.value.trim().length === 0;
+            });
+        });
+    });
+
+    // اضافه کردن انیمیشن
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes toastFadeIn {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        @keyframes toastFadeOut {
+            from { opacity: 1; transform: translateX(-50%) translateY(0); }
+            to { opacity: 0; transform: translateX(-50%) translateY(20px); }
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+</body>
+</html>
