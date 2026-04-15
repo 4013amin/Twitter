@@ -16,7 +16,6 @@ def chat_room(request, username=None):
     if not request.user.is_authenticated:
         return redirect('login')
 
-    # دریافت کاربران چت
     sent_messages = models.ChatMessage.objects.filter(sender=request.user).values_list('receiver', flat=True)
     received_messages = models.ChatMessage.objects.filter(receiver=request.user).values_list('sender', flat=True)
     chat_user_ids = set(list(sent_messages) + list(received_messages))

@@ -35,7 +35,6 @@
             margin: 0 auto;
         }
 
-        /* سایدبار چپ */
         .sidebar {
             width: 275px;
             padding: 20px;
@@ -78,7 +77,6 @@
             margin-right: 20px;
         }
 
-        /* فید اصلی */
         .main {
             flex: 1;
             max-width: 600px;
@@ -122,7 +120,6 @@
             font-weight: 700;
         }
 
-        /* آواتار */
         .avatar {
             width: 48px;
             height: 48px;
@@ -150,15 +147,6 @@
             font-size: 16px;
         }
 
-        .avatar-xs {
-            width: 32px;
-            height: 32px;
-            font-size: 13px;
-        }
-
-        /* ============================================
-           لیست کاربران - حالت عادی
-           ============================================ */
         .users-list {
             border-bottom: 1px solid var(--border);
         }
@@ -273,80 +261,6 @@
             flex-shrink: 0;
         }
 
-        .online-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #00ba7c;
-            border: 2px solid #fff;
-            position: absolute;
-            bottom: 12px;
-            right: 42px;
-        }
-
-        /* ============================================
-           لیست کاربران - حالت انتخاب (Selection Mode)
-           ============================================ */
-        .users-list.selection-mode .user-item {
-            padding-right: 50px;
-        }
-
-        .user-item .checkbox-wrapper {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            display: none;
-        }
-
-        .users-list.selection-mode .user-item .checkbox-wrapper {
-            display: flex;
-        }
-
-        .checkbox {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            border: 2px solid var(--gray);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            background: #fff;
-        }
-
-        .checkbox:hover {
-            border-color: var(--primary);
-        }
-
-        .checkbox.checked {
-            background: var(--primary);
-            border-color: var(--primary);
-        }
-
-        .checkbox.checked::after {
-            content: '✓';
-            color: #fff;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .checkbox.indeterminate {
-            background: var(--primary);
-            border-color: var(--primary);
-        }
-
-        .checkbox.indeterminate::after {
-            content: '—';
-            color: #fff;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        /* ============================================
-           نوار ابزار انتخاب (Selection Toolbar)
-           ============================================ */
         .selection-toolbar {
             display: none;
             align-items: center;
@@ -393,17 +307,55 @@
             background: rgba(255, 255, 255, 0.3);
         }
 
-        .selection-toolbar button.cancel-btn {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
         .selection-toolbar button.delete-btn:hover {
             background: rgba(249, 24, 128, 0.8);
         }
 
-        /* ============================================
-           پیام‌ها
-           ============================================ */
+        .users-list.selection-mode .user-item {
+            padding-right: 50px;
+        }
+
+        .user-item .checkbox-wrapper {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: none;
+        }
+
+        .users-list.selection-mode .user-item .checkbox-wrapper {
+            display: flex;
+        }
+
+        .checkbox {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid var(--gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #fff;
+        }
+
+        .checkbox:hover {
+            border-color: var(--primary);
+        }
+
+        .checkbox.checked {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .checkbox.checked::after {
+            content: '✓';
+            color: #fff;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
         .messages-container {
             flex: 1;
             overflow-y: auto;
@@ -463,20 +415,6 @@
             margin-left: 4px;
         }
 
-        .message.sent .message-bubble::before {
-            content: '◂';
-            color: var(--light-gray);
-            margin-left: -8px;
-            font-size: 20px;
-        }
-
-        .message.received .message-bubble::before {
-            content: '▸';
-            color: var(--primary);
-            margin-right: -8px;
-            font-size: 20px;
-        }
-
         .message-actions {
             display: none;
             gap: 8px;
@@ -507,7 +445,6 @@
             color: var(--like);
         }
 
-        /* اینفوی چت */
         .chat-info {
             padding: 12px 15px;
             border-bottom: 1px solid var(--border);
@@ -530,7 +467,6 @@
             font-size: 13px;
         }
 
-        /* فرم ورودی */
         .input-area {
             padding: 15px;
             border-top: 1px solid var(--border);
@@ -583,7 +519,6 @@
             cursor: not-allowed;
         }
 
-        /* صفحه انتخاب چت */
         .no-chat-selected {
             flex: 1;
             display: flex;
@@ -611,9 +546,6 @@
             line-height: 1.6;
         }
 
-        /* ============================================
-           انیمیشن‌ها
-           ============================================ */
         @keyframes slideIn {
             from {
                 opacity: 0;
@@ -643,9 +575,6 @@
             }
         }
 
-        /* ============================================
-           ریسپانسیو
-           ============================================ */
         @media (max-width: 1024px) {
             .sidebar {
                 width: 88px;
@@ -709,12 +638,10 @@
 
         <!-- نوار ابزار انتخاب -->
         <div class="selection-toolbar" id="selectionToolbar">
-            <button class="cancel-btn" onclick="cancelSelection()">✕</button>
+            <button class="cancel-btn" id="cancelSelectionBtn">✕</button>
             <span class="count"><span id="selectedCount">0</span> انتخاب شده</span>
             <div class="actions">
-                <button class="delete-btn" onclick="deleteSelectedConversations()">
-                    🗑️ حذف
-                </button>
+                <button class="delete-btn" id="deleteSelectedBtn">🗑️ حذف</button>
             </div>
         </div>
 
@@ -733,7 +660,7 @@
                 <div class="chat-info-handle">@{{ selected_user.username }}</div>
             </div>
             <a href="{% url 'user_profile' selected_user.username %}" class="back-btn" title="مشاهده پروفایل">👤</a>
-            <button onclick="deleteConversation()" class="back-btn" title="حذف مکالمه"
+            <button id="deleteConversationBtn" class="back-btn" title="حذف مکالمه"
                     style="background: none; border: none; cursor: pointer; font-size: 18px; padding: 8px; border-radius: 50%;">
                 🗑️
             </button>
@@ -748,13 +675,7 @@
                 <div class="message-time">{{ msg.time|date:"H:i" }}</div>
                 {% if msg.sender == user %}
                 <div class="message-actions">
-                    <form method="POST" action="{% url 'chat:delete_message' msg.id %}"
-                          style="display: inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="msg-action-btn delete"
-                                onclick="return confirm('حذف شود؟')">🗑️
-                        </button>
-                    </form>
+                    <button class="msg-action-btn delete" data-message-id="{{ msg.id }}">🗑️</button>
                 </div>
                 {% endif %}
             </div>
@@ -767,23 +688,16 @@
 
         <!-- فرم ارسال -->
         <div class="input-area">
-            <textarea
-                    id="message-input"
-                    placeholder="پیام خود را بنویسید..."
-                    rows="1"
-                    oninput="autoResize(this); toggleSendBtn()"
-            ></textarea>
-            <button class="send-btn" id="send-btn" onclick="sendMessage()" disabled>▲</button>
+            <textarea id="message-input" placeholder="پیام خود را بنویسید..." rows="1"></textarea>
+            <button class="send-btn" id="send-btn" disabled>▲</button>
         </div>
-
         {% else %}
         <!-- صفحه انتخاب چت -->
         <div class="no-chat-selected">
             <div class="no-chat-icon">✉️</div>
             <h2 class="no-chat-title">پیام‌های Direct</h2>
             <p class="no-chat-desc">
-                مکالمه‌ای را انتخاب کنید تا پیام‌هایتان را بخوانید و ارسال کنید.<br>
-                برای انتخاب چند مکالمه، روی یکی از آن‌ها کلیک طولانی کنید.
+                مکالمه‌ای را انتخاب کنید تا پیام‌هایتان را بخوانید و ارسال کنید.
             </p>
         </div>
         {% endif %}
@@ -796,21 +710,18 @@
                     <span style="color: var(--gray); font-weight: 400; font-size: 14px;">({{ users|length }})</span>
                 </div>
                 <div class="users-list-header-left">
-                    <button onclick="enterSelectionMode()" title="انتخاب چندگانه"
+                    <button id="enterSelectionModeBtn" title="انتخاب چندگانه"
                             style="background: none; border: none; cursor: pointer; font-size: 16px; padding: 6px; border-radius: 50%; color: var(--gray);">
                         ☑️
                     </button>
                 </div>
             </div>
-
             {% for u in users %}
-            <div class="user-item {% if selected_user == u %}active{% endif %}"
+            <div class="user-item {% if selected_user.username == u.username %}active{% endif %}"
                  data-username="{{ u.username }}"
-                 data-user-id="{{ u.id }}"
-                 onclick="handleUserClick(event, '{{ u.username }}', '{{ u.id }}')"
-                 oncontextmenu="handleRightClick(event, '{{ u.username }}', '{{ u.id }}')">
+                 data-user-id="{{ u.id }}">
                 <div class="checkbox-wrapper">
-                    <div class="checkbox" onclick="toggleCheckbox(event, '{{ u.username }}', '{{ u.id }}')"></div>
+                    <div class="checkbox"></div>
                 </div>
                 <div class="avatar avatar-sm">
                     {% if u.profile.image %}
@@ -821,7 +732,7 @@
                 </div>
                 <div class="user-item-info">
                     <div class="user-item-top">
-                        <span class="user-item-name">{{ u.get_full_name|default:u.username }}</span>
+                        <span class="user-item-name">{{ u.full_name|default:u.username }}</span>
                         <span class="user-item-time">{{ u.last_message_time|date:"H:i" }}</span>
                     </div>
                     <div class="user-item-bottom">
@@ -841,415 +752,46 @@
             {% endfor %}
         </div>
     </main>
-
-    <!-- سایدبار راست -->
-    <aside class="right-sidebar"
-           style="width: 350px; padding: 20px; position: sticky; top: 0; height: 100vh; display: none;">
-    </aside>
 </div>
 
 <script>
     // ============================================
     // متغیرهای سراسری
     // ============================================
+    const selectedUserId = {% if selected_user %}{{ selected_user.id }}{% else %}null{% endif %};
+
+   const selectedUsername = "{{ selected_user.username|default:'' }}";
+    const csrfToken = "{{ csrf_token }}";
+
+    const sendMessageUrl = "{% url 'chat:send_message' %}";
+
     let isSelectionMode = false;
     let selectedUsers = new Set();
     let longPressTimer = null;
     let isLongPress = false;
-    const LONG_PRESS_DURATION = 500; // میلی‌ثانیه
-
-    const selectedUserId = {
-    {
-        selected_user.id |
-    default:
-        "null"
-    }
-    }
-    ;
-    const selectedUsername = "{{ selected_user.username|default:"
-    " }}";
-
-    let chatSocket = null;
+    const LONG_PRESS_DURATION = 500;
 
     // ============================================
-    // WebSocket
+    // DOM Elements
     // ============================================
-    function connectWebSocket() {
-        if (selectedUserId) {
-            chatSocket = new WebSocket(
-                'ws://' + window.location.host + '/ws/chat/'
-            );
-
-            chatSocket.onopen = function () {
-                console.log('WebSocket connected');
-            };
-
-            chatSocket.onmessage = function (e) {
-                const data = JSON.parse(e.data);
-                handleWebSocketMessage(data);
-            };
-
-            chatSocket.onerror = function (e) {
-                console.error('WebSocket error:', e);
-            };
-
-            chatSocket.onclose = function () {
-                console.log('WebSocket closed, reconnecting...');
-                setTimeout(connectWebSocket, 3000);
-            };
-        }
-    }
-
-    connectWebSocket();
-
-    function handleWebSocketMessage(data) {
-        const action = data.action;
-
-        if (action === 'new_message') {
-            if (data.sender_id === selectedUserId || data.receiver_id === selectedUserId) {
-                appendMessage(data.message, data.sender_id === selectedUserId ? 'received' : 'sent', data.time, data.message_id);
-            }
-        } else if (action === 'message_deleted') {
-            removeMessage(data.message_id);
-        } else if (action === 'conversation_deleted') {
-            if (data.other_username === selectedUsername) {
-                clearAllMessages();
-            }
-        }
-    }
+    const messageInput = document.getElementById('message-input');
+    const sendBtn = document.getElementById('send-btn');
+    const messagesContainer = document.getElementById('messages');
+    const usersList = document.getElementById('usersList');
+    const selectionToolbar = document.getElementById('selectionToolbar');
+    const selectedCountEl = document.getElementById('selectedCount');
+    const cancelSelectionBtn = document.getElementById('cancelSelectionBtn');
+    const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+    const enterSelectionModeBtn = document.getElementById('enterSelectionModeBtn');
+    const deleteConversationBtn = document.getElementById('deleteConversationBtn');
 
     // ============================================
-    // انتخاب چندگانه (Selection Mode)
+    // توابع کمکی
     // ============================================
-    function enterSelectionMode() {
-        isSelectionMode = true;
-        selectedUsers.clear();
-        document.getElementById('usersList').classList.add('selection-mode');
-        document.getElementById('selectionToolbar').classList.add('active');
-        updateSelectionUI();
-    }
-
-    function exitSelectionMode() {
-        isSelectionMode = false;
-        selectedUsers.clear();
-        document.getElementById('usersList').classList.remove('selection-mode');
-        document.getElementById('selectionToolbar').classList.remove('active');
-        // حذف تیک‌های انتخاب شده
-        document.querySelectorAll('.checkbox.checked').forEach(cb => cb.classList.remove('checked'));
-    }
-
-    function cancelSelection() {
-        exitSelectionMode();
-    }
-
-    function updateSelectionUI() {
-        const count = selectedUsers.size;
-        document.getElementById('selectedCount').textContent = count;
-
-        // آپدیت دکمه حذف
-        const deleteBtn = document.querySelector('.selection-toolbar .delete-btn');
-        if (deleteBtn) {
-            deleteBtn.disabled = count === 0;
-            deleteBtn.style.opacity = count === 0 ? '0.5' : '1';
-        }
-    }
-
-    function toggleCheckbox(event, username, userId) {
-        event.stopPropagation();
-        event.preventDefault();
-
-        if (!isSelectionMode) {
-            enterSelectionMode();
-        }
-
-        const checkbox = event.currentTarget;
-        const key = userId;
-
-        if (selectedUsers.has(key)) {
-            selectedUsers.delete(key);
-            checkbox.classList.remove('checked');
-        } else {
-            selectedUsers.add(key);
-            checkbox.classList.add('checked');
-        }
-
-        updateSelectionUI();
-    }
-
-    function handleUserClick(event, username, userId) {
-        if (isLongPress) {
-            isLongPress = false;
-            return;
-        }
-
-        if (isSelectionMode) {
-            toggleCheckbox(event, username, userId);
-        } else {
-            // رفتن به صفحه چت
-            window.location.href = `/chat/${username}/`;
-        }
-    }
-
-    function handleRightClick(event, username, userId) {
-        event.preventDefault();
-        if (!isSelectionMode) {
-            enterSelectionMode();
-            const userItem = document.querySelector(`[data-user-id="${userId}"] .checkbox`);
-            if (userItem) {
-                userItem.click();
-            }
-        }
-    }
-
-    // ============================================
-    // کلیک طولانی (Long Press)
-    // ============================================
-    document.querySelectorAll('.user-item').forEach(item => {
-        item.addEventListener('touchstart', function (e) {
-            if (isSelectionMode) return;
-            longPressTimer = setTimeout(() => {
-                isLongPress = true;
-                enterSelectionMode();
-                const userId = this.dataset.userId;
-                const checkbox = this.querySelector('.checkbox');
-                if (checkbox && !selectedUsers.has(userId)) {
-                    checkbox.click();
-                }
-            }, LONG_PRESS_DURATION);
-        }, {passive: true});
-
-        item.addEventListener('touchend', function (e) {
-            if (longPressTimer) {
-                clearTimeout(longPressTimer);
-                longPressTimer = null;
-            }
-        });
-
-        item.addEventListener('touchmove', function (e) {
-            if (longPressTimer) {
-                clearTimeout(longPressTimer);
-                longPressTimer = null;
-            }
-        }, {passive: true});
-
-        // برای موس (دسکتاپ)
-        item.addEventListener('mousedown', function (e) {
-            if (isSelectionMode || e.button !== 0) return;
-            longPressTimer = setTimeout(() => {
-                isLongPress = true;
-                enterSelectionMode();
-                const userId = this.dataset.userId;
-                const checkbox = this.querySelector('.checkbox');
-                if (checkbox && !selectedUsers.has(userId)) {
-                    checkbox.click();
-                }
-            }, LONG_PRESS_DURATION);
-        });
-
-        item.addEventListener('mouseup', function (e) {
-            if (longPressTimer) {
-                clearTimeout(longPressTimer);
-                longPressTimer = null;
-            }
-        });
-
-        item.addEventListener('mouseleave', function (e) {
-            if (longPressTimer) {
-                clearTimeout(longPressTimer);
-                longPressTimer = null;
-            }
-        });
-    });
-
-    // ============================================
-    // حذف مکالمات انتخاب شده
-    // ============================================
-    function deleteSelectedConversations() {
-        if (selectedUsers.size === 0) return;
-
-        const count = selectedUsers.size;
-        const confirmMsg = count === 1
-            ? 'این مکالمه حذف شود؟'
-            : `${count} مکالمه حذف شوند؟`;
-
-        if (!confirm(confirmMsg + ' این عمل قابل بازگشت نیست.')) return;
-
-        const userIds = Array.from(selectedUsers);
-        const usernames = userIds.map(id => {
-            const item = document.querySelector(`[data-user-id="${id}"]`);
-            return item ? item.dataset.username : null;
-        }).filter(Boolean);
-
-        // حذف با WebSocket
-        if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
-            usernames.forEach(username => {
-                chatSocket.send(JSON.stringify({
-                    'action': 'delete_conversation',
-                    'username': username
-                }));
-            });
-        }
-
-        // Fallback: fetch
-        Promise.all(usernames.map(username =>
-            fetch(`/chat/conversation/${username}/delete/`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}'
-                }
-            }).then(r => r.json())
-        )).then(results => {
-            // انیمیشن حذف و حذف از DOM
-            userIds.forEach(userId => {
-                const userItem = document.querySelector(`[data-user-id="${userId}"]`);
-                if (userItem) {
-                    userItem.classList.add('deleting');
-                    setTimeout(() => userItem.remove(), 300);
-                }
-            });
-
-            exitSelectionMode();
-        });
-    }
-
-    // ============================================
-    // حذف یک مکالمه
-    // ============================================
-    function deleteConversation() {
-        if (!confirm('کل مکالمه حذف شود؟ این عمل قابل بازگشت نیست.')) return;
-
-        if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
-            chatSocket.send(JSON.stringify({
-                'action': 'delete_conversation',
-                'username': selectedUsername
-            }));
-        }
-
-        fetch(`/chat/conversation/${selectedUsername}/delete/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}'
-            }
-        }).then(r => r.json()).then(data => {
-            if (data.success) {
-                clearAllMessages();
-                window.location.href = '/chat/';
-            }
-        });
-    }
-
-    // ============================================
-    // پیام‌ها
-    // ============================================
-    function appendMessage(text, type, time, messageId) {
-        const messagesDiv = document.getElementById('messages');
-        if (!messagesDiv) return;
-
-        const div = document.createElement('div');
-        div.className = 'message ' + type;
-        div.setAttribute('data-message-id', messageId);
-        div.innerHTML = `
-            <div class="message-bubble">${escapeHtml(text)}</div>
-            <div class="message-time">${time || ''}</div>
-            ${type === 'sent' ? `
-            <div class="message-actions">
-                <button class="msg-action-btn delete" onclick="deleteMessage(${messageId}, this)" title="حذف">🗑️</button>
-            </div>
-            ` : ''}
-        `;
-        messagesDiv.appendChild(div);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    }
-
-    function removeMessage(messageId) {
-        const el = document.querySelector(`[data-message-id="${messageId}"]`);
-        if (el) {
-            el.style.transition = 'opacity 0.3s, transform 0.3s';
-            el.style.opacity = '0';
-            el.style.transform = 'scale(0.8)';
-            setTimeout(() => el.remove(), 300);
-        }
-    }
-
-    function clearAllMessages() {
-        const messagesDiv = document.getElementById('messages');
-        if (messagesDiv) {
-            messagesDiv.innerHTML = `
-                <div style="text-align: center; color: var(--gray); padding: 40px; font-size: 15px;">
-                    مکالمه حذف شد
-                </div>
-            `;
-        }
-    }
-
     function escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
-    }
-
-    function sendMessage() {
-        const input = document.getElementById('message-input');
-        const message = input.value.trim();
-        if (!message) return;
-
-        if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
-            chatSocket.send(JSON.stringify({
-                'action': 'send',
-                'message': message,
-                'receiver_id': selectedUserId
-            }));
-            input.value = '';
-            toggleSendBtn();
-        } else {
-            fetch("{% url 'chat:send_message' %}", {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    'message': message,
-                    'receiver_id': selectedUserId
-                })
-            })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        appendMessage(message, 'sent', data.time, data.message_id);
-                        input.value = '';
-                        toggleSendBtn();
-                    }
-                });
-        }
-    }
-
-    function deleteMessage(messageId, btnElement) {
-        if (!confirm('این پیام حذف شود؟')) return;
-
-        if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
-            chatSocket.send(JSON.stringify({
-                'action': 'delete_message',
-                'message_id': messageId
-            }));
-        }
-
-        fetch(`/chat/message/${messageId}/delete/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}'
-            }
-        }).then(r => r.json()).then(data => {
-            if (data.success) {
-                removeMessage(messageId);
-            }
-        });
-    }
-
-    function toggleSendBtn() {
-        const input = document.getElementById('message-input');
-        const btn = document.getElementById('send-btn');
-        if (btn) btn.disabled = input.value.trim().length === 0;
     }
 
     function autoResize(el) {
@@ -1257,24 +799,317 @@
         el.style.height = Math.min(el.scrollHeight, 120) + 'px';
     }
 
-    document.getElementById('message-input')?.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
+    function toggleSendBtn() {
+        if (sendBtn) {
+            sendBtn.disabled = messageInput.value.trim().length === 0;
         }
-    });
-
-    const messagesDiv = document.getElementById('messages');
-    if (messagesDiv) {
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
 
-    // کلید Escape برای خروج از حالت انتخاب
+    // ============================================
+    // ارسال پیام
+    // ============================================
+    function sendMessage() {
+        const message = messageInput.value.trim();
+        if (!message || !selectedUserId) return;
+
+        console.log('Sending message:', message, 'to:', selectedUserId);
+
+        fetch(sendMessageUrl, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                'message': message,
+                'receiver_id': selectedUserId
+            })
+        })
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (data.success) {
+                    appendMessage(message, 'sent', data.time, data.message_id);
+                    messageInput.value = '';
+                    autoResize(messageInput);
+                    toggleSendBtn();
+                } else {
+                    alert('خطا: ' + (data.error || 'پیام ارسال نشد'));
+                }
+            })
+            .catch(error => {
+                console.error('Error sending message:', error);
+                alert('خطا در ارسال پیام');
+            });
+    }
+
+    function appendMessage(text, type, time, messageId) {
+        if (!messagesContainer) return;
+
+        const div = document.createElement('div');
+        div.className = 'message ' + type;
+        div.setAttribute('data-message-id', messageId);
+
+        let actionsHtml = '';
+        if (type === 'sent') {
+            actionsHtml = `
+                <div class="message-actions">
+                    <button class="msg-action-btn delete" data-message-id="${messageId}">🗑️</button>
+                </div>
+            `;
+        }
+
+        div.innerHTML = `
+            <div class="message-bubble">${escapeHtml(text)}</div>
+            <div class="message-time">${time || ''}</div>
+            ${actionsHtml}
+        `;
+
+        messagesContainer.appendChild(div);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+        // اضافه کردن event listener برای دکمه حذف
+        const deleteBtn = div.querySelector('.msg-action-btn.delete');
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', function () {
+                deleteMessage(this.getAttribute('data-message-id'));
+            });
+        }
+    }
+
+    function deleteMessage(messageId) {
+        if (!confirm('این پیام حذف شود؟')) return;
+
+        fetch(`/chat/message/${messageId}/delete/`, {
+            method: 'POST',
+            headers: {'X-CSRFToken': csrfToken}
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    const el = document.querySelector(`[data-message-id="${messageId}"]`);
+                    if (el) {
+                        el.style.transition = 'opacity 0.3s, transform 0.3s';
+                        el.style.opacity = '0';
+                        el.style.transform = 'scale(0.8)';
+                        setTimeout(() => el.remove(), 300);
+                    }
+                }
+            });
+    }
+
+    // ============================================
+    // انتخاب چندگانه
+    // ============================================
+    function enterSelectionMode() {
+        isSelectionMode = true;
+        selectedUsers.clear();
+        usersList.classList.add('selection-mode');
+        selectionToolbar.classList.add('active');
+        updateSelectionUI();
+    }
+
+    function exitSelectionMode() {
+        isSelectionMode = false;
+        selectedUsers.clear();
+        usersList.classList.remove('selection-mode');
+        selectionToolbar.classList.remove('active');
+        document.querySelectorAll('.checkbox.checked').forEach(cb => cb.classList.remove('checked'));
+    }
+
+    function updateSelectionUI() {
+        const count = selectedUsers.size;
+        selectedCountEl.textContent = count;
+        if (deleteSelectedBtn) {
+            deleteSelectedBtn.disabled = count === 0;
+            deleteSelectedBtn.style.opacity = count === 0 ? '0.5' : '1';
+        }
+    }
+
+    function toggleCheckbox(userId, checkbox) {
+        if (selectedUsers.has(userId)) {
+            selectedUsers.delete(userId);
+            checkbox.classList.remove('checked');
+        } else {
+            selectedUsers.add(userId);
+            checkbox.classList.add('checked');
+        }
+        updateSelectionUI();
+    }
+
+    function deleteSelectedConversations() {
+        if (selectedUsers.size === 0) return;
+        if (!confirm(selectedUsers.size + ' مکالمه حذف شوند؟')) return;
+
+        const userIds = Array.from(selectedUsers);
+        const usernames = userIds.map(id => {
+            const item = document.querySelector(`[data-user-id="${id}"]`);
+            return item ? item.dataset.username : null;
+        }).filter(Boolean);
+
+        Promise.all(usernames.map(username =>
+            fetch(`/chat/conversation/${username}/delete/`, {
+                method: 'POST',
+                headers: {'X-CSRFToken': csrfToken}
+            }).then(r => r.json())
+        )).then(results => {
+            userIds.forEach(userId => {
+                const userItem = document.querySelector(`[data-user-id="${userId}"]`);
+                if (userItem) {
+                    userItem.classList.add('deleting');
+                    setTimeout(() => userItem.remove(), 300);
+                }
+            });
+            exitSelectionMode();
+        });
+    }
+
+    function deleteConversation() {
+        if (!confirm('کل مکالمه حذف شود؟')) return;
+
+        fetch(`/chat/conversation/${selectedUsername}/delete/`, {
+            method: 'POST',
+            headers: {'X-CSRFToken': csrfToken}
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/chat/';
+                }
+            });
+    }
+
+    // ============================================
+    // Event Listeners
+    // ============================================
+    if (messageInput) {
+        messageInput.addEventListener('input', function () {
+            autoResize(this);
+            toggleSendBtn();
+        });
+
+        messageInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+    }
+
+    if (sendBtn) {
+        sendBtn.addEventListener('click', sendMessage);
+    }
+
+    if (enterSelectionModeBtn) {
+        enterSelectionModeBtn.addEventListener('click', enterSelectionMode);
+    }
+
+    if (cancelSelectionBtn) {
+        cancelSelectionBtn.addEventListener('click', exitSelectionMode);
+    }
+
+    if (deleteSelectedBtn) {
+        deleteSelectedBtn.addEventListener('click', deleteSelectedConversations);
+    }
+
+    if (deleteConversationBtn) {
+        deleteConversationBtn.addEventListener('click', deleteConversation);
+    }
+
+    // Event listeners برای آیتم‌های کاربران
+    document.querySelectorAll('.user-item').forEach(item => {
+        const userId = item.dataset.userId;
+        const username = item.dataset.username;
+        const checkbox = item.querySelector('.checkbox');
+
+        // کلیک روی آیتم
+        item.addEventListener('click', function (e) {
+            if (isSelectionMode) {
+                if (checkbox) toggleCheckbox(userId, checkbox);
+            } else {
+                window.location.href = `/chat/${username}/`;
+            }
+        });
+
+        // کلیک روی چک‌باکس
+        if (checkbox) {
+            checkbox.addEventListener('click', function (e) {
+                e.stopPropagation();
+                if (!isSelectionMode) {
+                    enterSelectionMode();
+                }
+                toggleCheckbox(userId, this);
+            });
+        }
+
+        // کلیک راست
+        item.addEventListener('contextmenu', function (e) {
+            e.preventDefault();
+            if (!isSelectionMode) {
+                enterSelectionMode();
+            }
+            if (checkbox && !selectedUsers.has(userId)) {
+                checkbox.classList.add('checked');
+                selectedUsers.add(userId);
+                updateSelectionUI();
+            }
+        });
+
+        // Long press برای موبایل
+        item.addEventListener('touchstart', function (e) {
+            if (isSelectionMode) return;
+            longPressTimer = setTimeout(() => {
+                isLongPress = true;
+                enterSelectionMode();
+                if (checkbox && !selectedUsers.has(userId)) {
+                    checkbox.classList.add('checked');
+                    selectedUsers.add(userId);
+                    updateSelectionUI();
+                }
+            }, LONG_PRESS_DURATION);
+        }, {passive: true});
+
+        item.addEventListener('touchend', function () {
+            if (longPressTimer) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+            }
+        });
+
+        item.addEventListener('touchmove', function () {
+            if (longPressTimer) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+            }
+        });
+    });
+
+    // Event listeners برای دکمه‌های حذف پیام
+    document.querySelectorAll('.msg-action-btn.delete').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const messageId = this.getAttribute('data-message-id');
+            if (messageId) deleteMessage(messageId);
+        });
+    });
+
+    // کلید Escape
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && isSelectionMode) {
             exitSelectionMode();
         }
     });
+
+    // اسکرول به آخر پیام‌ها
+    if (messagesContainer) {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    console.log('Chat page loaded');
+    console.log('selectedUserId:', selectedUserId);
+    console.log('selectedUsername:', selectedUsername);
 </script>
 </body>
 </html>
