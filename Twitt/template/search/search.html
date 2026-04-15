@@ -16,71 +16,351 @@
             --border: #cfd9de;
             --like: #f91880;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #fff; color: var(--text); }
-        .layout { display: flex; max-width: 1260px; margin: 0 auto; min-height: 100vh; }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #fff;
+            color: var(--text);
+        }
+
+        .layout {
+            display: flex;
+            max-width: 1260px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
 
         /* سایدبار چپ */
-        .sidebar { width: 275px; padding: 20px; position: sticky; top: 0; height: 100vh; border-left: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
-        .logo { font-size: 28px; color: var(--primary); margin-bottom: 25px; padding: 10px; display: inline-block; }
-        .nav-menu { list-style: none; }
-        .nav-item { display: flex; align-items: center; padding: 15px; margin: 5px 0; border-radius: 30px; cursor: pointer; font-size: 20px; color: var(--text); text-decoration: none; transition: background 0.2s; }
-        .nav-item:hover { background: var(--light-gray); }
-        .nav-item.active { font-weight: 700; }
-        .nav-item span { margin-right: 20px; }
-        .tweet-btn { background: var(--primary); color: #fff; border: none; border-radius: 30px; padding: 15px; font-size: 17px; font-weight: 700; margin-top: 20px; cursor: pointer; width: 90%; transition: background 0.2s; text-decoration: none; display: block; text-align: center; }
-        .tweet-btn:hover { background: var(--primary-hover); }
+        .sidebar {
+            width: 275px;
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .logo {
+            font-size: 28px;
+            color: var(--primary);
+            margin-bottom: 25px;
+            padding: 10px;
+            display: inline-block;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin: 5px 0;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text);
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .nav-item:hover {
+            background: var(--light-gray);
+        }
+
+        .nav-item.active {
+            font-weight: 700;
+        }
+
+        .nav-item span {
+            margin-right: 20px;
+        }
+
+        .tweet-btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            padding: 15px;
+            font-size: 17px;
+            font-weight: 700;
+            margin-top: 20px;
+            cursor: pointer;
+            width: 90%;
+            transition: background 0.2s;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+
+        .tweet-btn:hover {
+            background: var(--primary-hover);
+        }
 
         /* فید اصلی */
-        .main { flex: 1; max-width: 600px; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: 100vh; }
-        .header { position: sticky; top: 0; background: rgba(255, 255, 255, 0.95); padding: 15px; border-bottom: 1px solid var(--border); z-index: 100; }
-        .header h1 { font-size: 20px; font-weight: 700; }
+        .main {
+            flex: 1;
+            max-width: 600px;
+            border-left: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            min-height: 100vh;
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 700;
+        }
 
         /* باکس سرچ */
-        .search-container { padding: 15px; border-bottom: 1px solid var(--border); }
-        .search-form { display: flex; align-items: center; background: var(--light-gray); border-radius: 30px; padding: 12px 20px; }
-        .search-form input { background: none; border: none; outline: none; font-size: 16px; width: 100%; font-family: inherit; }
-        .search-form button { background: none; border: none; cursor: pointer; font-size: 18px; }
+        .search-container {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .search-form {
+            display: flex;
+            align-items: center;
+            background: var(--light-gray);
+            border-radius: 30px;
+            padding: 12px 20px;
+        }
+
+        .search-form input {
+            background: none;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            width: 100%;
+            font-family: inherit;
+        }
+
+        .search-form button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+        }
 
         /* تب‌ها */
-        .tabs { display: flex; border-bottom: 1px solid var(--border); }
-        .tab { flex: 1; padding: 15px; text-align: center; cursor: pointer; color: var(--gray); font-weight: 500; border-bottom: 2px solid transparent; }
-        .tab.active { color: var(--text); border-bottom-color: var(--primary); font-weight: 700; }
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            color: var(--gray);
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab.active {
+            color: var(--text);
+            border-bottom-color: var(--primary);
+            font-weight: 700;
+        }
 
         /* نتایج */
-        .results { padding: 0; }
-        .result-section { display: none; }
-        .result-section.active { display: block; }
+        .results {
+            padding: 0;
+        }
+
+        .result-section {
+            display: none;
+        }
+
+        .result-section.active {
+            display: block;
+        }
 
         /* کارت کاربر */
-        .user-card { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.2s; }
-        .user-card:hover { background: rgba(0,0,0,0.02); }
-        .user-avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; font-size: 18px; overflow: hidden; flex-shrink: 0; margin-left: 12px; }
-        .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .user-info { flex: 1; }
-        .user-name { font-weight: 700; font-size: 15px; }
-        .user-username { color: var(--gray); font-size: 14px; }
+        .user-card {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .user-card:hover {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+            font-size: 18px;
+            overflow: hidden;
+            flex-shrink: 0;
+            margin-left: 12px;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .user-username {
+            color: var(--gray);
+            font-size: 14px;
+        }
 
         /* توییت */
-        .tweet { padding: 15px; border-bottom: 1px solid var(--border); display: flex; gap: 12px; cursor: pointer; }
-        .tweet:hover { background: rgba(0, 0, 0, 0.02); }
-        .tweet-avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; font-size: 18px; overflow: hidden; flex-shrink: 0; }
-        .tweet-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .tweet-content { flex: 1; min-width: 0; }
-        .tweet-header { display: flex; align-items: center; gap: 5px; margin-bottom: 4px; }
-        .tweet-name { font-weight: 700; font-size: 15px; }
-        .tweet-handle, .tweet-time { color: var(--gray); font-size: 15px; }
-        .tweet-text { font-size: 15px; line-height: 1.5; margin-bottom: 10px; }
-        .tweet-image { width: 100%; max-height: 300px; object-fit: cover; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 10px; }
-        .tweet-actions { display: flex; justify-content: space-between; max-width: 400px; }
-        .action-btn { display: flex; align-items: center; gap: 5px; color: var(--gray); font-size: 13px; background: none; border: none; cursor: pointer; padding: 8px; border-radius: 50%; }
+        .tweet {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .tweet:hover {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .tweet-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+            font-size: 18px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .tweet-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .tweet-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .tweet-header {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 4px;
+        }
+
+        .tweet-name {
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .tweet-handle, .tweet-time {
+            color: var(--gray);
+            font-size: 15px;
+        }
+
+        .tweet-text {
+            font-size: 15px;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .tweet-image {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            margin-bottom: 10px;
+        }
+
+        .tweet-actions {
+            display: flex;
+            justify-content: space-between;
+            max-width: 400px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--gray);
+            font-size: 13px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+        }
 
         /* خالی */
-        .empty-state { text-align: center; padding: 60px 20px; }
-        .empty-state h2 { font-size: 20px; margin-bottom: 10px; }
-        .empty-state p { color: var(--gray); font-size: 15px; }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
 
-        @media (max-width: 768px) { .sidebar { display: none; } .main { border: none; max-width: 100%; } }
+        .empty-state h2 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: var(--gray);
+            font-size: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main {
+                border: none;
+                max-width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -90,23 +370,24 @@
         <a href="{% url 'home' %}" class="logo">𝕏</a>
         <nav>
             <ul class="nav-menu">
-                <li><a href="{% url 'home' %}" class="nav-item">🏠 <span>خانه</span></a></li>
-                <li><a href="{% url 'search' %}" class="nav-item active">🔍 <span>جستجو</span></a></li>
+                <li><a href="{% url 'home' %}" class="nav-item active">🏠 <span>خانه</span></a></li>
+                <li><a href="{% url 'search' %}" class="nav-item">🔍 <span>جستجو</span></a></li>
                 <li><a href="#" class="nav-item">🔔 <span>اعلانات</span></a></li>
-                <li><a href="#" class="nav-item">✉️ <span>پیام‌ها</span></a></li>
+                <li><a href="{% url 'chat:chat' %}" class="nav-item">✉️ <span>پیام‌ها</span></a></li>
                 <li><a href="{% url 'profile' %}" class="nav-item">👤 <span>پروفایل</span></a></li>
             </ul>
         </nav>
         {% if user.is_authenticated %}
-            <a href="{% url 'home' %}" class="tweet-btn">توییت</a>
-            <form method="POST" action="{% url 'logout' %}" style="margin-top: auto;">
-                {% csrf_token %}
-                <button type="submit" class="nav-item" style="width: 100%; border: none; background: none; text-align: right;">
-                    🚪 <span>خروج</span>
-                </button>
-            </form>
+        <a href="{% url 'home' %}" class="tweet-btn">توییت</a>
+        <form method="POST" action="{% url 'logout' %}" style="margin-top: auto;">
+            {% csrf_token %}
+            <button type="submit" class="nav-item"
+                    style="width: 100%; border: none; background: none; text-align: right;">
+                🚪 <span>خروج</span>
+            </button>
+        </form>
         {% else %}
-            <a href="{% url 'request_otp' %}" class="tweet-btn">ورود</a>
+        <a href="{% url 'request_otp' %}" class="tweet-btn">ورود</a>
         {% endif %}
     </aside>
 
@@ -135,62 +416,65 @@
             <!-- کاربران -->
             <div class="result-section active" id="users-section">
                 {% for user in users %}
-                    <div class="user-card" onclick="window.location.href='{% url 'profile' user.username %}'">
-                        <div class="user-avatar">
-                            {% if user.profile.image %}
-                                <img src="{{ user.profile.image.url }}" alt="{{ user.username }}">
-                            {% else %}
-                                {{ user.username|make_list|first|upper }}
-                            {% endif %}
-                        </div>
-                        <div class="user-info">
-                            <div class="user-name">{{ user.profile.name|default:user.username }}</div>
-                            <div class="user-username">@{{ user.username }}</div>
-                        </div>
+                <div class="user-card" onclick="window.location.href='{% url 'profile' user.username %}'">
+                    <div class="user-avatar">
+                        {% if user.profile.image %}
+                        <img src="{{ user.profile.image.url }}" alt="{{ user.username }}">
+                        {% else %}
+                        {{ user.username|make_list|first|upper }}
+                        {% endif %}
                     </div>
+                    <div class="user-info">
+                        <div class="user-name">{{ user.profile.name|default:user.username }}</div>
+                        <div class="user-username">@{{ user.username }}</div>
+                    </div>
+                </div>
                 {% empty %}
-                    {% if query %}
-                        <div class="empty-state">
-                            <h2>کاربری پیدا نشد</h2>
-                            <p>کاربری با این نام وجود ندارد</p>
-                        </div>
-                    {% endif %}
+                {% if query %}
+                <div class="empty-state">
+                    <h2>کاربری پیدا نشد</h2>
+                    <p>کاربری با این نام وجود ندارد</p>
+                </div>
+                {% endif %}
                 {% endfor %}
             </div>
 
             <!-- توییت‌ها -->
             <div class="result-section" id="tweets-section">
                 {% for tweet in tweets %}
-                    <article class="tweet" onclick="window.location.href='/tweet/{{ tweet.id }}/'">
-                        <div class="tweet-avatar" onclick="event.stopPropagation(); window.location.href='{% url 'profile' tweet.user.username %}'">
-                            {% if tweet.user.profile.image %}
-                                <img src="{{ tweet.user.profile.image.url }}" alt="{{ tweet.user.username }}">
-                            {% else %}
-                                {{ tweet.user.username|make_list|first|upper }}
-                            {% endif %}
+                <article class="tweet" onclick="window.location.href='/tweet/{{ tweet.id }}/'">
+                    <div class="tweet-avatar"
+                         onclick="event.stopPropagation(); window.location.href='{% url 'profile' tweet.user.username %}'">
+                        {% if tweet.user.profile.image %}
+                        <img src="{{ tweet.user.profile.image.url }}" alt="{{ tweet.user.username }}">
+                        {% else %}
+                        {{ tweet.user.username|make_list|first|upper }}
+                        {% endif %}
+                    </div>
+                    <div class="tweet-content">
+                        <div class="tweet-header">
+                            <span class="tweet-name">{{ tweet.user_name }}</span>
+                            <span class="tweet-handle">@{{ tweet.user.username }}</span>
+                            <span class="tweet-time">· {{ tweet.created_at|date:"H:i" }} · {{ tweet.created_at|date:"Y/m/d" }}</span>
                         </div>
-                        <div class="tweet-content">
-                            <div class="tweet-header">
-                                <span class="tweet-name">{{ tweet.user_name }}</span>
-                                <span class="tweet-handle">@{{ tweet.user.username }}</span>
-                                <span class="tweet-time">· {{ tweet.created_at|date:"H:i" }} · {{ tweet.created_at|date:"Y/m/d" }}</span>
-                            </div>
-                            <p class="tweet-text">{{ tweet.content }}</p>
-                            {% if tweet.image %}<img src="{{ tweet.image.url }}" alt="تصویر" class="tweet-image">{% endif %}
-                            <div class="tweet-actions">
-                                <button class="action-btn">💬 {{ tweet.comments_count }}</button>
-                                <button class="action-btn">🔁 0</button>
-                                <button class="action-btn">{% if tweet.user_liked %}❤️{% else %}🤍{% endif %} {{ tweet.likes_count }}</button>
-                            </div>
+                        <p class="tweet-text">{{ tweet.content }}</p>
+                        {% if tweet.image %}<img src="{{ tweet.image.url }}" alt="تصویر" class="tweet-image">{% endif %}
+                        <div class="tweet-actions">
+                            <button class="action-btn">💬 {{ tweet.comments_count }}</button>
+                            <button class="action-btn">🔁 0</button>
+                            <button class="action-btn">{% if tweet.user_liked %}❤️{% else %}🤍{% endif %} {{
+                                tweet.likes_count }}
+                            </button>
                         </div>
-                    </article>
+                    </div>
+                </article>
                 {% empty %}
-                    {% if query %}
-                        <div class="empty-state">
-                            <h2>توییتی پیدا نشد</h2>
-                            <p>توییتی با این محتوا وجود ندارد</p>
-                        </div>
-                    {% endif %}
+                {% if query %}
+                <div class="empty-state">
+                    <h2>توییتی پیدا نشد</h2>
+                    <p>توییتی با این محتوا وجود ندارد</p>
+                </div>
+                {% endif %}
                 {% endfor %}
             </div>
         </div>

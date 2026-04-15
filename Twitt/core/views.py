@@ -23,7 +23,7 @@ from asgiref.sync import async_to_sync
 from django.core.paginator import Paginator
 from django import template
 from django.contrib.auth.models import User
-from chatMessage.models import ChatMessage
+from . import sms_service
 
 register = template.Library()
 
@@ -49,6 +49,16 @@ def request_otp_view(request):
             otp.save()
 
             print(f"OTP for {phone}: {otp.code}")
+
+            # Send SMS
+            try:
+                print("در حال ارسال SMS...")
+                result = sms_service.send_sms(phone, otp.code)
+                print(f"SMS ارسال شد! نتیجه: {result}")
+            except Exception as e:
+                print(f"خطای SMS: {e}")
+                import traceback
+                traceback.print_exc()
 
             return redirect('verify_otp', phone=phone)
         else:
