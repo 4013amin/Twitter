@@ -11,3 +11,7 @@ class RequestOTPSerializer(serializers.ModelSerializer):
         if not value.isdigit() or len(value) != 11 or not value.startswith('09'):
             raise serializers.ValidationError("لطفاً یک شماره موبایل معتبر (مانند 09123456789) وارد کنید.")
         return value
+
+
+class MessageSerializer(serializers.Serializer):
+    message = serializers.CharField(read_only=True)
