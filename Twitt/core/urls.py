@@ -8,7 +8,7 @@ from . import consumers
 
 urlpatterns = [
     path('', views.home, name='home'),
-    path('request-otp/', views.request_otp_view, name='request_otp'),
+    path('request-otpv/', views.request_otp_view, name='request_otpvi'),
     path('verify-otp/<str:phone>/', views.verify_otp_view, name='verify_otp'),
     path('setup-profile/', views.setup_profile, name='setup_profile'),
     path('profile/', views.profile_view, name='profile'),
