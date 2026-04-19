@@ -93,6 +93,17 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+# else:
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'tweetdbylo_db',
+#         'USER': 'postgres',
+#         'PASSWORD': 'oJDjkbzC9NOY6jdYln6s',
+#         'HOST': 'remote-pishgaman.runflare.com',
+#         'PORT': '30880',
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -131,38 +142,40 @@ STATIC_URL = 'static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-SMS_IR_API_KEY = "fTisg3oGV8mUzxnKhr9a81XpbbTekqsa7Y2YYwdZ5S1X7GDi"
-SMS_IR_LINE_NUMBER = "09362629118"
+SMS_IR_API_KEY = "cL4bEAGisBcEYjq1GK3pwRVBinb2w87dr6GhZv5concrN1Lg"
+SMS_IR_LINE_NUMBER = "10008663"
 SMS_IR_TEMPLATE_ID = 302699
 
-
-
-
 LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "verbose": {
-            "format": "{levelname} {asctime} {module} {message}",
-            "style": "{",
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
         },
     },
-    "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-            "formatter": "verbose",
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+            'stream': 'ext://sys.stdout',  # خروجی به stdout
         },
-        "file": {
-            "class": "logging.FileHandler",
-            "filename": "sms_debug.log",
-            "formatter": "verbose",
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': '/tmp/django_debug.log',
+            'formatter': 'verbose',
         },
     },
-    "loggers": {
-        "utils.sms_service": {
-            "handlers": ["console", "file"],
-            "level": "INFO",
-            "propagate": True,
+    'root': {
+        'handlers': ['console', 'file'],
+        'level': 'DEBUG',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': False,
         },
     },
 }

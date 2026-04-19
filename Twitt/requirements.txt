@@ -1,2 +1,25 @@
-Looking in indexes: https://mirror-pypi.runflare.com/simple
-Requirement already satisfied: pip in /home/delta/PycharmProjects/Twitter/myenv/lib/python3.11/site-packages (23.2)
+Django==4.2.23
+djangorestframework==3.15.2
+django-cors-headers==4.7.0
+django-crispy-forms==2.3
+django-bootstrap3==10.0.1
+django-bootstrap5==24.2
+django-bleach==3.1.0
+django-autoslug==1.9.9
+django-hashid-field==3.4.1
+psycopg2-binary==2.9.10
+celery==5.5.3
+redis==5.2.1
+pillow
+requests
+python-dateutil
+pytz
+python-decouple
+gunicorn
+whitenoise
+numpy
+opencv-python
+deepface
+channels
+channels-redis
+daphne

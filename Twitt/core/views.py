@@ -48,7 +48,7 @@ def request_otp_view(request):
 
             otp.save()
 
-            print(f"OTP for {phone}: {otp.code}")
+            logger.info(f"OTP for {phone}: {otp.code}")
 
             # Send SMS
             try:
@@ -376,22 +376,22 @@ def confirm_delete_account(request):
     return redirect('delete_account_request')
 
 
-def home(request):
-    comments_qs = models.Comment.objects.select_related(
-        'user',
-        'user__profile'
-    ).order_by('-created_at')
 
-    tweets = models.Tweets.objects.filter(parent__isnull=True).select_related(
-        'user',
-        'user__profile'
-    ).prefetch_related(
-        Prefetch('comments', queryset=comments_qs),
-        'likes'
+def home(request):
+    tweets_qs = models.Tweets.objects.filter(parent__isnull=True).select_related(
+        'user', 'user__profile'
     ).annotate(
         likes_count_annotate=Count('likes', distinct=True),
         comments_count_annotate=Count('comments', distinct=True)
     ).order_by('-created_at')[:20]
+
+    comments_qs = models.Comment.objects.select_related(
+        'user', 'user__profile'
+    ).order_by('-created_at')
+
+    tweets = tweets_qs.prefetch_related(
+        Prefetch('comments', queryset=comments_qs[:3], to_attr='latest_comments')
+    )
 
     user_liked_tweets = set()
     if request.user.is_authenticated:
@@ -402,15 +402,28 @@ def home(request):
             ).values_list('tweet_id', flat=True)
         )
 
-    def get_user_display_name(self):
-        if hasattr(self.user, 'profile') and self.user.profile.name:
-            return self.user.profile.name
-        return self.user.username
-
     tweet_list = []
     for tweet in tweets:
-        comments = list(tweet.comments.all()[:3])
-        tweet_data = {
+        user_profile = getattr(tweet.user, 'profile', None)
+        if user_profile and user_profile.name:
+            user_display_name = user_profile.name
+        else:
+            user_display_name = tweet.user.username
+
+        comments_data = []
+        for comment in getattr(tweet, 'latest_comments', []):
+            comment_user_profile = getattr(comment.user, 'profile', None)
+            comment_display_name = comment_user_profile.name if comment_user_profile and comment_user_profile.name else comment.user.username
+            comments_data.append({
+                'id': comment.id,
+                'content': comment.content,
+                'user': comment.user,
+                'username': comment.user.username,
+                'user_name': comment_display_name,
+                'created_at': comment.created_at,
+            })
+
+        tweet_list.append({
             'id': tweet.id,
             'content': tweet.content,
             'image': tweet.image,
@@ -419,15 +432,14 @@ def home(request):
             'tweet_type': tweet.tweet_type,
             'created_at': tweet.created_at,
             'user': tweet.user,
-            'user_name': tweet.user.profile.name if hasattr(tweet.user,
-                                                            'profile') and tweet.user.profile.name else tweet.user.username,
-
+            'user_name': user_display_name,
             'likes_count': tweet.likes_count_annotate,
             'comments_count': tweet.comments_count_annotate,
             'user_liked': tweet.id in user_liked_tweets,
-            'comments': comments,
-        }
-        tweet_list.append(tweet_data)
+            'comments': comments_data,
+            # برای راحتی در تمپلیت می‌توانید متد مجازی هم اضافه کنید:
+            # 'get_user_display_name': lambda: user_display_name
+        })
 
     return render(request, 'home/home.html', {
         'tweets': tweet_list,
@@ -628,12 +640,8 @@ def add_comment(request, tweet_id):
         content = request.POST.get('content', '').strip()
 
         if not content:
-            return JsonResponse({
-                'success': False,
-                'error': 'متن کامنت نمی‌تواند خالی باشد'
-            }, status=400)
+            return JsonResponse({'success': False, 'error': 'متن کامنت نمی‌تواند خالی باشد'}, status=400)
 
-        # ایجاد کامنت
         comment = models.Comment.objects.create(
             user=request.user,
             tweet=tweet,
@@ -643,42 +651,23 @@ def add_comment(request, tweet_id):
         tweet.comments_count += 1
         tweet.save(update_fields=['comments_count'])
 
-        comments_count = tweet.comments.count()
-
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            'tweet_activities',
-            {
-                'type': 'tweet_comment_update',
-                'tweet_id': tweet_id,
-                'comments_count': comments_count,
-                'new_comment': {
-                    'id': comment.id,
-                    'content': comment.content,
-                    'username': request.user.username,
-                    'user_name': request.user.profile.name if hasattr(request.user,
-                                                                      'profile') else request.user.username,
-                },
-                'username': request.user.username,
-            }
-        )
+        user_name = request.user.profile.name if hasattr(request.user,
+                                                         'profile') and request.user.profile.name else request.user.username
 
         return JsonResponse({
             'success': True,
-            'comments_count': comments_count,
+            'comments_count': tweet.comments_count,
             'comment': {
                 'id': comment.id,
                 'content': comment.content,
                 'username': request.user.username,
+                'user_name': user_name,  # ← اضافه شد
             }
         })
 
     except Exception as e:
         logger.error(f"خطا در ثبت کامنت: {str(e)}")
-        return JsonResponse({
-            'success': False,
-            'error': str(e)
-        }, status=500)
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
 
 @login_required
