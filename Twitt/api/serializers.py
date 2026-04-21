@@ -4,7 +4,11 @@ from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiTypes, e
 from core.models import OTP
 
 
-class RequestOTPSerializer(serializers.ModelSerializer):
+class MessageSerializer(serializers.Serializer):
+    message = serializers.CharField(read_only=True)
+
+
+class RequestOTPSerializer(serializers.Serializer):
     phone = serializers.CharField(max_length=11)
 
     def validate_phone_number(self, value):
@@ -13,5 +17,6 @@ class RequestOTPSerializer(serializers.ModelSerializer):
         return value
 
 
-class MessageSerializer(serializers.Serializer):
-    message = serializers.CharField(read_only=True)
+class VerifyOTPSerializer(serializers.Serializer):
+    code = serializers.CharField(max_length=6)
+
