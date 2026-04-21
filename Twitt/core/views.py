@@ -133,7 +133,7 @@ def setup_profile(request):
         )
 
     if profile and profile.name:
-        return redirect('profile')
+        return redirect('home')
 
     if request.method == 'POST':
         form = forms.ProfileForm(request.POST, request.FILES, instance=profile)
@@ -374,7 +374,6 @@ def confirm_delete_account(request):
         return redirect('home')
 
     return redirect('delete_account_request')
-
 
 
 def home(request):

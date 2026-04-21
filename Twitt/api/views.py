@@ -1,5 +1,5 @@
 from datetime import timedelta
-
+from xml import parsers
 from django.contrib.auth import login
 from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
@@ -14,6 +14,7 @@ from rest_framework.permissions import AllowAny
 from . import serializers
 import logging
 from core.models import OTP, User, Tweets, Profile, Like, Follow, Comment
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 logger = logging.getLogger(__name__)
 
@@ -148,3 +149,81 @@ class VerifyOTPAPIView(APIView):
             'user_id': user.id,
             'profile_completed': bool(profile.name)
         }, status=status.HTTP_200_OK)
+
+
+class SetupProfileAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_description="تکمیل پروفایل کاربر (نام و سایر اطلاعات). این ویو بعد از ورود و در صورتی که کاربر پروفایل کامل نداشته باشد استفاده می‌شود.",
+        request_body=serializers.SetupProfileSerializer,
+        responses={
+            200: openapi.Response(
+                description="پروفایل با موفقیت به‌روزرسانی شد",
+                examples={
+                    "application/json": {
+                        "message": "پروفایل با موفقیت تکمیل شد.",
+                        "redirect_url": "home",
+                        "profile": {
+                            "name": "علی رضایی",
+                            "phone": "09123456789",
+                            "bio": ""
+                        }
+                    }
+                }
+            ),
+            400: "داده‌های ارسالی نامعتبر یا شماره تلفن تکراری",
+            404: "پروفایل یافت نشد"
+        },
+        tags=["Profile"]
+    )
+    def post(self, request, *args, **kwargs):
+        profile, created = Profile.objects.get_or_create(
+            user=request.user,
+            defaults={
+                'phone': request.user.username,
+                'name': ''
+            }
+        )
+
+        if profile.name:
+            return Response(
+                {
+                    'message': 'پروفایل قبلاً تکمیل شده است.',
+                    'redirect_url': 'home',
+                    'profile_completed': True
+                },
+                status=status.HTTP_200_OK
+            )
+
+        serializer = serializers.SetupProfileSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        profile.name = serializer.validated_data.get('name', profile.name)
+
+        new_phone = serializer.validated_data.get('phone')
+        if new_phone and new_phone != profile.phone:
+            if Profile.objects.exclude(pk=profile.pk).filter(phone=new_phone).exists():
+                return Response(
+                    {'error': 'این شماره تلفن قبلاً توسط کاربر دیگری استفاده شده است.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            profile.phone = new_phone
+
+        profile.save()
+
+        return Response(
+            {
+                'message': 'پروفایل با موفقیت تکمیل شد.',
+                'redirect_url': 'home',
+                'profile': {
+                    'name': profile.name,
+                    'phone': profile.phone,
+                    # 'bio': profile.bio,
+                },
+                'profile_completed': True
+            },
+            status=status.HTTP_200_OK
+        )
+

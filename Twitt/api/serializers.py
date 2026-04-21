@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiTypes, extend_schema_field
-from core.models import OTP
+from core.models import OTP, Profile, Comment, Follow, Tweets, Like, User
 
 
 class MessageSerializer(serializers.Serializer):
@@ -19,4 +19,18 @@ class RequestOTPSerializer(serializers.Serializer):
 
 class VerifyOTPSerializer(serializers.Serializer):
     code = serializers.CharField(max_length=6)
+
+
+class SetupProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = '__all__'
+
+
+# Profile
+class UserProfileSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    profileImage = serializers.SerializerMethodField()
+
+    class Meta:
 
