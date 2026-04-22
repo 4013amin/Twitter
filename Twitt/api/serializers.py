@@ -29,8 +29,6 @@ class SetupProfileSerializer(serializers.ModelSerializer):
 
 # Profile
 class UserProfileSerializer(serializers.ModelSerializer):
-    name = serializers.SerializerMethodField()
-    profileImage = serializers.SerializerMethodField()
-
     class Meta:
-
+        model = Profile
+        fields = '__all__'

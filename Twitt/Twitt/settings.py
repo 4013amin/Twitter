@@ -154,6 +154,23 @@ SMS_IR_API_KEY = "cL4bEAGisBcEYjq1GK3pwRVBinb2w87dr6GhZv5concrN1Lg"
 SMS_IR_LINE_NUMBER = "10008663"
 SMS_IR_TEMPLATE_ID = 302699
 
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Twitter API',
+    'DESCRIPTION': 'Documentation of the Twitter API',
+    'VERSION': '1.0.0',
+    # اضافه کردن تعریف دقیق برای Bearer Token
+    'AUTHENTICATION_WHITELIST': [
+        'rest_framework.authentication.TokenAuthentication',
+        # اگر از JWT استفاده می‌کنید، نام کلاس auth مربوطه را اینجا بنویسید
+    ],
+    'SECURITY': [
+        {
+            'Bearer': []
+        },
+    ],
+}
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

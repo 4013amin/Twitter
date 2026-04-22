@@ -16,6 +16,8 @@ import logging
 from core.models import OTP, User, Tweets, Profile, Like, Follow, Comment
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
+from .serializers import UserProfileSerializer
+
 logger = logging.getLogger(__name__)
 
 
@@ -24,23 +26,6 @@ logger = logging.getLogger(__name__)
 class RequestOTPAPIView(APIView):
     permission_classes = (AllowAny,)
 
-    @swagger_auto_schema(
-        operation_description="درخواست کد تایید (OTP) برای شماره تلفن ارسال می‌شود.",
-        request_body=serializers.RequestOTPSerializer,
-        responses={
-            200: openapi.Response(
-                description="OTP با موفقیت ارسال شد",
-                examples={
-                    "application/json": {
-                        "message": "OTP send successfully",
-                        "phone": "09123456789"
-                    }
-                }
-            ),
-            400: "اطلاعات نامعتبر (مثلاً فرمت تلفن اشتباه)"
-        },
-        tags=["Authentication"]
-    )
     def post(self, request, *args, **kwargs):
         serializer = serializers.RequestOTPSerializer(data=request.data)
         if serializer.is_valid():
@@ -62,36 +47,6 @@ class RequestOTPAPIView(APIView):
 
 class VerifyOTPAPIView(APIView):
 
-    @swagger_auto_schema(
-        operation_description="تایید کد OTP دریافت شده و ورود کاربر (یا ساخت کاربر جدید).",
-        manual_parameters=[
-            openapi.Parameter(
-                'phone',
-                openapi.IN_PATH,
-                description="شماره تلفن کاربر (همان شماره‌ای که کد به آن ارسال شده)",
-                type=openapi.TYPE_STRING,
-                required=True,
-                example="09123456789"
-            )
-        ],
-        request_body=serializers.VerifyOTPSerializer,
-        responses={
-            200: openapi.Response(
-                description="ورود موفقیت‌آمیز",
-                examples={
-                    "application/json": {
-                        "message": "ورود موفقیت‌آمیز بود.",
-                        "redirect_url": "home",
-                        "user_id": 1,
-                        "profile_completed": True
-                    }
-                }
-            ),
-            400: "کد منقضی شده یا اطلاعات ارسالی نامعتبر",
-            404: "کد تایید نادرست است"
-        },
-        tags=["Authentication"]
-    )
     def post(self, request, phone, *args, **kwargs):
         serializer = serializers.VerifyOTPSerializer(data=request.data)
         if not serializer.is_valid():
@@ -154,29 +109,6 @@ class VerifyOTPAPIView(APIView):
 class SetupProfileAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
-    @swagger_auto_schema(
-        operation_description="تکمیل پروفایل کاربر (نام و سایر اطلاعات). این ویو بعد از ورود و در صورتی که کاربر پروفایل کامل نداشته باشد استفاده می‌شود.",
-        request_body=serializers.SetupProfileSerializer,
-        responses={
-            200: openapi.Response(
-                description="پروفایل با موفقیت به‌روزرسانی شد",
-                examples={
-                    "application/json": {
-                        "message": "پروفایل با موفقیت تکمیل شد.",
-                        "redirect_url": "home",
-                        "profile": {
-                            "name": "علی رضایی",
-                            "phone": "09123456789",
-                            "bio": ""
-                        }
-                    }
-                }
-            ),
-            400: "داده‌های ارسالی نامعتبر یا شماره تلفن تکراری",
-            404: "پروفایل یافت نشد"
-        },
-        tags=["Profile"]
-    )
     def post(self, request, *args, **kwargs):
         profile, created = Profile.objects.get_or_create(
             user=request.user,
@@ -227,3 +159,14 @@ class SetupProfileAPIView(APIView):
             status=status.HTTP_200_OK
         )
 
+
+class ProfileAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, username=None):
+        if username:
+            profile = get_object_or_404(User, username=username)
+        else:
+            profile = Profile.objects.filter(user=request.user).first()
+
+        profile_serializer = UserProfileSerializer(profile)
