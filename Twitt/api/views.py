@@ -15,11 +15,10 @@ from . import serializers
 import logging
 from core.models import OTP, User, Tweets, Profile, Like, Follow, Comment
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .serializers import UserProfileSerializer
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.authtoken.models import Token
-
+from django.db.models import Q, Count, Prefetch
 
 logger = logging.getLogger(__name__)
 
@@ -71,7 +70,6 @@ class RequestOTPAPIView(APIView):
             }, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 class VerifyOTPAPIView(APIView):
@@ -152,10 +150,9 @@ class VerifyOTPAPIView(APIView):
         user = User.objects.filter(username=phone).first()
         if not user:
             user = User.objects.create_user(username=phone)
-            
-            
+
         token, created = Token.objects.get_or_create(user=user)
-        
+
         profile = Profile.objects.filter(user=user).first()
         if not profile:
             existing_profile = Profile.objects.filter(phone=phone).first()
@@ -180,10 +177,9 @@ class VerifyOTPAPIView(APIView):
             'message': message,
             'redirect_url': redirect_url,
             'user_id': user.id,
-            'token': token.key ,
+            'token': token.key,
             'profile_completed': bool(profile.name)
         }, status=status.HTTP_200_OK)
-
 
 
 class SetupProfileAPIView(APIView):
@@ -304,14 +300,44 @@ class ProfileAPIView(APIView):
         tags=['پروفایل'],
     )
     def get(self, request, username=None):
-        
         if username:
-            profile = get_object_or_404(User, username=username)
+            user_instance = get_object_or_404(User, username=username)
+            profile_instance = get_object_or_404(Profile, user=user_instance)
         else:
-            profile = Profile.objects.filter(user=request.user).first()
-            
-        profile_serializer = UserProfileSerializer(profile)
-        
+            user_instance = request.user
+            profile_instance = get_object_or_404(Profile, user=user_instance)
+
+        profile_serializer = serializers.UserProfileSerializer(profile_instance)
+
+        active_tab = request.GET.get('tab', 'posts')
+        tweets_qs = None
+
+        if active_tab == 'posts':
+            tweets_qs = Tweets.objects.filter(user=user_instance, parent__isnull=True)
+        elif active_tab == 'replies':
+            tweets_qs = Tweets.objects.filter(user=user_instance, parent__isnull=False)
+        elif active_tab == 'media':
+            tweets_qs = Tweets.objects.filter(user=user_instance, parent__isnull=True).filter(
+                Q(image__isnull=False) | Q(video__isnull=False)
+            )
+        elif active_tab == 'likes':
+            liked_tweet_ids = Like.objects.filter(user=user_instance).values_list('tweet_id', flat=True)
+            tweets_qs = Tweets.objects.filter(id__in=liked_tweet_ids, parent__isnull=True)
+        else:
+            tweets_qs = Tweets.objects.filter(user=user_instance, parent__isnull=True)
+
+        tweets_qs = tweets_qs.select_related('user__profile').annotate(
+            likes_count_annotate=Count('likes', distinct=True),
+            comments_count_annotate=Count('comments', distinct=True)
+        ).order_by('-created_at')
+
+        for tweet in tweets_qs:
+            tweet.user_liked = Like.objects.filter(user=request.user, tweet=tweet).exists()
+
+        tweets_serializer = serializers.PostsSerializer(tweets_qs, many=True, context={'request': request})
+
         return Response({
-            'profile': profile_serializer.data
+            'profile': profile_serializer.data,
+            'tweets': tweets_serializer.data,
+            'active_tab': active_tab,
         })
