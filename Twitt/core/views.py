@@ -24,6 +24,7 @@ from django.core.paginator import Paginator
 from django import template
 from django.contrib.auth.models import User
 from . import sms_service
+from django.core.cache import cache
 
 register = template.Library()
 
@@ -376,6 +377,15 @@ def confirm_delete_account(request):
     return redirect('delete_account_request')
 
 
+# hashtag Section
+def get_trending_hashtags(limit=5):
+    trending_hashtags = cache.get('trending_hashtags')
+    if not trending_hashtags:
+        trending_hashtags = list(models.Hashtag.objects.order_by('-tweet_count')[:limit])
+        cache.set('trending_hashtags', trending_hashtags, 60 * 10)
+    return trending_hashtags
+
+
 def home(request):
     tweets_qs = models.Tweets.objects.filter(parent__isnull=True).select_related(
         'user', 'user__profile'
@@ -422,6 +432,9 @@ def home(request):
                 'created_at': comment.created_at,
             })
 
+        # HashTag
+        hashtags = get_trending_hashtags()
+
         tweet_list.append({
             'id': tweet.id,
             'content': tweet.content,
@@ -442,6 +455,7 @@ def home(request):
 
     return render(request, 'home/home.html', {
         'tweets': tweet_list,
+        'hashtags': hashtags,
     })
 
 

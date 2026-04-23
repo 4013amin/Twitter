@@ -748,6 +748,7 @@
             font-size: 24px;
         }
 
+        /* ========== RESPONSIVE (موبایل) ========== */
         @media (max-width: 768px) {
             .sidebar, .right-sidebar {
                 display: none;
@@ -774,6 +775,151 @@
             .follow-btn {
                 padding: 4px 12px;
                 font-size: 11px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .header {
+                padding: 12px;
+            }
+
+            .header h1 {
+                font-size: 18px;
+            }
+
+            .composer {
+                padding: 12px;
+                gap: 8px;
+            }
+
+            .avatar,
+            .tweet-avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+
+            .composer textarea {
+                font-size: 16px;
+                padding: 8px 0;
+            }
+
+            .composer-footer {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .composer-icons {
+                gap: 2px;
+            }
+
+            .composer-icons button {
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+
+            .post-btn {
+                padding: 6px 16px;
+                font-size: 14px;
+            }
+
+            .tweet-name {
+                font-size: 14px;
+            }
+
+            .tweet-handle,
+            .tweet-time {
+                font-size: 12px;
+            }
+
+            .tweet-text {
+                font-size: 14px;
+            }
+
+            .tweet-actions {
+                gap: 4px;
+                max-width: 100%;
+                flex-wrap: wrap;
+            }
+
+            .action-btn {
+                padding: 6px 10px;
+                font-size: 12px;
+                gap: 4px;
+            }
+
+            .comment-form .avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 12px;
+            }
+
+            .comment-form input {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+
+            .comment-form button {
+                padding: 6px 14px;
+                font-size: 13px;
+            }
+
+            .comment-avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 12px;
+            }
+
+            .comment-name {
+                font-size: 13px;
+            }
+
+            .comment-username,
+            .comment-time {
+                font-size: 11px;
+            }
+
+            .comment-text {
+                font-size: 13px;
+            }
+
+            .follow-section {
+                top: 4px;
+                left: 8px;
+            }
+
+            .follow-btn {
+                padding: 3px 10px;
+                font-size: 10px;
+            }
+
+            .mobile-nav-item .icon {
+                font-size: 22px;
+            }
+
+            .mobile-nav-item span:last-child {
+                font-size: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .tweet {
+                gap: 8px;
+            }
+
+            .tweet-actions {
+                justify-content: space-between;
+                margin: 8px 0 4px;
+            }
+
+            .action-btn {
+                padding: 5px 8px;
+            }
+
+            .composer-icons button {
+                width: 32px;
+                height: 32px;
             }
         }
 
@@ -1111,31 +1257,25 @@
         </div>
         <div class="trends-box">
             <h3 class="trends-title">ترندها</h3>
+            {% for hashtag in hashtags %}
             <div class="trend-item">
-                <div class="trend-category">در حال پیگیری</div>
-                <div class="trend-name">#برنامه_نویسی</div>
-                <div class="trend-count">۲۴.۵K توییت</div>
+                <div class="trend-name">#{{ hashtag.name }}</div>
+                <div class="trend-count">{{ hashtag.tweet_count }} توییت</div>
             </div>
-            <div class="trend-item">
-                <div class="trend-category">فناوری</div>
-                <div class="trend-name">#هوش_مصنوعی</div>
-                <div class="trend-count">۱۸.۲K توییت</div>
-            </div>
-            <div class="trend-item">
-                <div class="trend-category">ورزش</div>
-                <div class="trend-name">#فوتبال</div>
-                <div class="trend-count">۵۶.۷K توییت</div>
-            </div>
+            {% empty %}
+            <div class="trend-item">هیچ ترندی وجود ندارد</div>
+            {% endfor %}
         </div>
     </aside>
 </div>
 
-<!-- ناوبری موبایل -->
+<!-- ناوبری موبایل (با اضافه شدن لینک پروفایل) -->
 <nav class="mobile-nav">
     <a href="{% url 'home' %}" class="mobile-nav-item active"><span class="icon">🏠</span><span>خانه</span></a>
     <a href="#" class="mobile-nav-item"><span class="icon">🔍</span><span>جستجو</span></a>
     <a href="#" class="mobile-nav-item"><span class="icon">🔔</span><span>اعلانات</span></a>
     <a href="#" class="mobile-nav-item"><span class="icon">✉️</span><span>پیام‌ها</span></a>
+    <a href="{% url 'profile' %}" class="mobile-nav-item"><span class="icon">👤</span><span>پروفایل</span></a>
 </nav>
 
 <script>

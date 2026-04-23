@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 # Create your models here.
@@ -39,6 +40,9 @@ class Tweets(models.Model):
     content = models.TextField()
     tweet_type = models.CharField(max_length=10, choices=TWEET_TYPE_CHOICES)
 
+    # Hashtag
+    hashtag = models.ForeignKey('Hashtag', on_delete=models.CASCADE, related_name='tweets', null=True, blank=True)
+
     # File
     image = models.ImageField(upload_to='image_posts', blank=True, null=True)
     voice = models.FileField(upload_to='tweet_voices', blank=True, null=True)
@@ -63,6 +67,18 @@ class Tweets(models.Model):
     @property
     def is_reply(self):
         return self.parent is not None
+
+    # Hashtag
+    def extract_and_save_hashtags(self):
+        import re
+        hashtag_name = re.findall(r'#\w+', self.content)
+        for name in hashtag_name:
+            hashtag, create = Hashtag.objects.get_or_create(name=name)
+            if not self.hashtags.filter(id=hashtag.id).exists():
+                self.hashtags.add(hashtag)
+                hashtag.tweet_count += 1
+                hashtag.last_used = timezone.now()
+                hashtag.save()
 
 
 class Like(models.Model):
@@ -102,3 +118,13 @@ class Follow(models.Model):
 
     def __str__(self):
         return f"{self.follower.username} follows {self.following.username}"
+
+
+class Hashtag(models.Model):
+    name = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_used_at = models.DateTimeField(auto_now=True)
+    tweet_count = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.name

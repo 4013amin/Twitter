@@ -1,7 +1,5 @@
-# tweets/admin.py
-
 from django.contrib import admin
-from .models import OTP, Profile, Tweets
+from .models import OTP, Profile, Tweets, Hashtag
 
 
 @admin.register(OTP)
@@ -32,3 +30,9 @@ class TweetsAdmin(admin.ModelAdmin):
         return obj.content[:50] + '...' if len(obj.content) > 50 else obj.content
 
     content_preview.short_description = 'محتوا'
+
+
+@admin.register(Hashtag)
+class HashtagAdmin(admin.ModelAdmin):
+    list_display = ('name', 'created_at')
+    search_fields = ('name',)
