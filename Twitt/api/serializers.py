@@ -8,6 +8,10 @@ class MessageSerializer(serializers.Serializer):
     message = serializers.CharField(read_only=True)
 
 
+class AuthTokenSerializer(serializers.Serializer):
+    token = serializers.CharField(read_only=True)
+
+
 class RequestOTPSerializer(serializers.Serializer):
     phone = serializers.CharField(max_length=11)
 

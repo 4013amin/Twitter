@@ -829,7 +829,6 @@ def follow_users(request, user_id):
 def unfollow_users(request, user_id):
     user_to_unfollow = get_object_or_404(User, id=user_id)
 
-    # ✅ == اضافه شد
     if request.user == user_to_unfollow:
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({'error': 'شما نمی‌توانید خودتان را آنفالو کنید'}, status=400)
