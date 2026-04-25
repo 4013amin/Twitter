@@ -1273,9 +1273,9 @@
 <!-- ناوبری موبایل (با اضافه شدن لینک پروفایل) -->
 <nav class="mobile-nav">
     <a href="{% url 'home' %}" class="mobile-nav-item active"><span class="icon">🏠</span><span>خانه</span></a>
-    <a href="#" class="mobile-nav-item"><span class="icon">🔍</span><span>جستجو</span></a>
+    <a href="{% url 'search' %}" class="mobile-nav-item"><span class="icon">🔍</span><span>جستجو</span></a>
     <a href="#" class="mobile-nav-item"><span class="icon">🔔</span><span>اعلانات</span></a>
-    <a href="#" class="mobile-nav-item"><span class="icon">✉️</span><span>پیام‌ها</span></a>
+    <a href="{% url 'chat:chat'%}" class="mobile-nav-item"><span class="icon">✉️</span><span>پیام‌ها</span></a>
     <a href="{% url 'profile' %}" class="mobile-nav-item"><span class="icon">👤</span><span>پروفایل</span></a>
 </nav>
 
