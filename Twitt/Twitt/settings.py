@@ -173,7 +173,7 @@ STATIC_URL = 'static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-SMS_IR_API_KEY = "cL4bEAGisBcEYjq1GK3pwRVBinb2w87dr6GhZv5concrN1Lg"
+SMS_IR_API_KEY = "LCd2ar6gzF9MC4k4oxtyEVjDvmfC6qgQ1ReOiVcgPau76SEi"
 SMS_IR_LINE_NUMBER = "10008663"
 SMS_IR_TEMPLATE_ID = 302699
 

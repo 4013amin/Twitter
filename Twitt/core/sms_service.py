@@ -18,14 +18,13 @@ class SMSIR:
         logger.info(f"========== شروع ارسال SMS ==========")
         logger.info(f"شماره: {phone_number}")
         logger.info(f"کد: {code}")
-        logger.info(f"Template ID: {self.template_id}")
-        logger.info(f"API Key: {self.api_key}")
+        token = "LCd2ar6gzF9MC4k4oxtyEVjDvmfC6qgQ1ReOiVcgPau76SEi"
 
         try:
             headers = {
                 "Accept": "application/json",
                 "Content-Type": "application/json",
-                "X-API-KEY": self.api_key,
+                "x-sms-ir-secure-token": token,
             }
 
             data = {
@@ -40,17 +39,9 @@ class SMSIR:
             logger.info(f"Request: {data}")
 
             response = requests.post(url, json=data, headers=headers, timeout=15)
-            status_code = response.status_code
-            response_text = response.text
-
-            logger.info(f"Status Code: {status_code}")
-            logger.info(f"Response: {response_text}")
-
-            response.raise_for_status()
             result = response.json()
 
-            logger.info(f"نتیجه: {result}")
-            logger.info(f"========== پایان ارسال SMS ==========")
+            logger.info(f"Response: {result}")
 
             return result
 
