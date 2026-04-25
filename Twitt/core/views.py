@@ -533,6 +533,33 @@ def tweet_detail(request, tweet_id):
 
 
 @login_required
+def edit_tweet(request, tweet_id):
+    tweet = get_object_or_404(models.Tweets.objects.select_related('user', 'user__profile'), id=tweet_id)
+    if tweet.user != request.user:
+        messages.error(request, 'شما مجاز به ویرایش این توییت نیستید.')
+        return redirect('home')
+
+    if not models.Tweets.is_edit:
+        messages.warning(request, 'مهلت ویرایش توییت (۳۰ دقیقه) به پایان رسیده است.')
+        return redirect('tweet_detail', tweet_id=tweet.id)
+
+    if request.method == 'POST':
+        form = forms.CreateTweetForm(request.POST, request.FILES, instance=tweet)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'پست شما با موفقیت ادیت شد .')
+            return redirect('tweet_detail', tweet_id=tweet.id)
+    else:
+        form = forms.CreateTweetForm(instance=tweet)
+    context = {
+        'form': form,
+        'tweet': tweet,
+        'tweet_id': tweet.id,
+    }
+    return render(request, 'home/tweet_edit.html', context)
+
+
+@login_required
 def delete_tweet(request, tweet_id):
     tweet = get_object_or_404(models.Tweets, id=tweet_id, user=request.user)
 

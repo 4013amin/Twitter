@@ -727,6 +727,14 @@
                         <button type="submit" class="delete-btn" title="حذف توییت">🗑️</button>
                     </form>
                     {% endif %}
+
+                    {% if user.is_authenticated and tweet.user == user %}
+                    <a href="{% url 'edit_tweet' tweet.id %}" class="action-btn edit"
+                       style="text-decoration: none; cursor: pointer;">
+                        <span class="action-icon">✏️</span>
+                    </a>
+                    {% endif %}
+
                 </div>
             </div>
 

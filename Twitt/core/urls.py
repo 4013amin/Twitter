@@ -17,6 +17,7 @@ urlpatterns = [
 
     path('edit-profile/', views.edit_profile_view, name='edit_profile'),
     path('create-tweet/', views.create_tweet, name='create_tweet'),
+    path('edit-tweet/<int:tweet_id>/', views.edit_tweet, name='edit_tweet'),
     path('tweet/<int:tweet_id>/', views.tweet_detail, name='tweet_detail'),
     path('tweet/<int:tweet_id>/reply/', views.create_reply, name='create_reply'),
     path('tweet_delete/<int:tweet_id>/', views.delete_reply, name='delete_reply'),

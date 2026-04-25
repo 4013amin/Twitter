@@ -1,0 +1,679 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>ویرایش توییت - Twitter Clone</title>
+    <style>
+        /* کپی کردن تمام استایل‌های home.html برای یکپارچگی */
+        :root {
+            --primary: #1d9bf0;
+            --primary-hover: #0c8ae3;
+            --text: #0f1419;
+            --gray: #536471;
+            --light-gray: #eff3f4;
+            --border: #cfd9de;
+            --like: #f91880;
+            --retweet: #00ba7c;
+            --bg-hover: rgba(0, 0, 0, 0.03);
+            --card-radius: 20px;
+            --transition: all 0.2s ease;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+            background: #ffffff;
+            color: var(--text);
+            line-height: 1.5;
+        }
+        .layout {
+            display: flex;
+            max-width: 1280px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+        }
+        /* سایدبار چپ */
+        .sidebar {
+            width: 275px;
+            padding: 20px 12px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            background: white;
+        }
+        .logo {
+            font-size: 30px;
+            color: var(--primary);
+            margin-bottom: 30px;
+            padding: 12px;
+            display: inline-block;
+            width: fit-content;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+        .logo:hover { background: rgba(29, 155, 240, 0.1); }
+        .nav-menu { list-style: none; margin-bottom: 20px; }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin: 4px 0;
+            border-radius: 30px;
+            font-size: 20px;
+            color: var(--text);
+            text-decoration: none;
+            transition: var(--transition);
+            gap: 16px;
+            font-weight: 500;
+        }
+        .nav-item:hover { background: var(--light-gray); }
+        .nav-item.active { font-weight: 700; }
+        .tweet-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 14px;
+            font-size: 17px;
+            font-weight: 700;
+            margin: 16px 0;
+            cursor: pointer;
+            width: 90%;
+            transition: var(--transition);
+            text-align: center;
+            display: inline-block;
+        }
+        .tweet-btn:hover { background: var(--primary-hover); }
+
+        /* فید اصلی - تنظیمات خاص برای صفحه ویرایش */
+        .main {
+            flex: 1;
+            max-width: 600px;
+            border-left: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            min-height: 100vh;
+            background: white;
+        }
+        .header {
+            position: sticky;
+            top: 0;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .header h1 { font-size: 20px; font-weight: 800; }
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text);
+            padding: 8px;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+        .back-btn:hover { background: var(--light-gray); }
+
+        /* کامپوزر ویرایش */
+        .composer {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 12px;
+            background: white;
+        }
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .composer-content { flex: 1; }
+        .composer textarea {
+            width: 100%;
+            border: none;
+            font-size: 18px;
+            resize: none;
+            min-height: 60px;
+            outline: none;
+            padding: 12px 0;
+            font-family: inherit;
+        }
+        .composer textarea::placeholder { color: var(--gray); }
+        .composer-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+            margin-top: 8px;
+        }
+        .composer-icons { display: flex; align-items: center; gap: 4px; }
+        .composer-icons button {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--primary);
+            padding: 8px;
+            border-radius: 50%;
+            transition: var(--transition);
+            width: 40px;
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .composer-icons button:hover { background: rgba(29, 155, 240, 0.1); }
+        .post-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 8px 20px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 15px;
+            transition: var(--transition);
+        }
+        .post-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .cancel-btn {
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 30px;
+            transition: var(--transition);
+            margin-left: 10px;
+        }
+        .cancel-btn:hover { background: var(--light-gray); }
+
+        /* مدیا پرویو */
+        #media-preview { margin-top: 12px; position: relative; }
+        .remove-media {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .tweet-image, .tweet-image video {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            margin: 8px 0;
+        }
+        .tweet-voice audio { width: 100%; margin: 8px 0; border-radius: 30px; }
+
+        /* ضبط صدا */
+        #voice-recording-panel {
+            position: absolute;
+            bottom: 50px;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            z-index: 1000;
+            width: 280px;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* سایدبار راست */
+        .right-sidebar {
+            width: 350px;
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: none;
+        }
+        @media (min-width: 1025px) { .right-sidebar { display: block; } }
+        .search-box {
+            background: var(--light-gray);
+            border-radius: 30px;
+            padding: 12px 20px;
+            margin-bottom: 24px;
+        }
+        .search-box input {
+            background: none;
+            border: none;
+            outline: none;
+            font-size: 15px;
+            width: 100%;
+            font-family: inherit;
+        }
+        .trends-box { background: #f7f9f9; border-radius: 20px; padding: 16px; }
+        .trends-title { font-size: 20px; font-weight: 800; margin-bottom: 12px; }
+        .trend-item { padding: 12px 0; border-bottom: 1px solid var(--border); cursor: pointer; transition: var(--transition); }
+        .trend-item:hover { background: rgba(0, 0, 0, 0.02); }
+        .trend-name { font-weight: 700; font-size: 15px; margin: 4px 0; }
+        .trend-count { font-size: 13px; color: var(--gray); }
+
+        /* پیام‌ها */
+        .messages { padding: 12px 16px; }
+        .message { padding: 12px 16px; border-radius: 12px; margin-bottom: 8px; font-size: 14px; }
+        .message.success { background: rgba(0, 186, 124, 0.1); color: #00ba7c; }
+        .message.error { background: rgba(249, 24, 128, 0.1); color: var(--like); }
+        .message.warning { background: rgba(255, 173, 31, 0.1); color: #ffad1f; }
+
+        /* ناوبری موبایل */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid var(--border);
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+        }
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--gray);
+            font-size: 12px;
+            gap: 4px;
+            transition: var(--transition);
+        }
+        .mobile-nav-item.active { color: var(--primary); }
+        .mobile-nav-item .icon { font-size: 24px; }
+
+        /* ریسپانسیو */
+        @media (max-width: 768px) {
+            .sidebar, .right-sidebar { display: none; }
+            .main { border: none; max-width: 100%; }
+            .mobile-nav { display: flex; }
+        }
+        @media (max-width: 600px) {
+            .header { padding: 12px; }
+            .header h1 { font-size: 18px; }
+            .composer { padding: 12px; gap: 8px; }
+            .avatar { width: 40px; height: 40px; font-size: 16px; }
+            .composer textarea { font-size: 16px; padding: 8px 0; }
+            .composer-footer { flex-wrap: wrap; gap: 8px; }
+            .composer-icons { gap: 2px; }
+            .composer-icons button { width: 36px; height: 36px; font-size: 18px; }
+            .post-btn { padding: 6px 16px; font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="layout">
+    <!-- سایدبار چپ -->
+    <aside class="sidebar">
+        <a href="{% url 'home' %}" class="logo">𝕏</a>
+        <nav>
+            <ul class="nav-menu">
+                <li><a href="{% url 'home' %}" class="nav-item">🏠 <span>خانه</span></a></li>
+                <li><a href="{% url 'search' %}" class="nav-item">🔍 <span>جستجو</span></a></li>
+                <li><a href="#" class="nav-item">🔔 <span>اعلانات</span></a></li>
+                <li><a href="{% url 'chat:chat' %}" class="nav-item">✉️ <span>پیام‌ها</span></a></li>
+                <li><a href="{% url 'profile' %}" class="nav-item">👤 <span>پروفایل</span></a></li>
+            </ul>
+        </nav>
+        {% if user.is_authenticated %}
+        <button class="tweet-btn" onclick="document.getElementById('tweet-content').focus()">توییت</button>
+        <form method="POST" action="{% url 'logout' %}" style="margin-top: auto;">
+            {% csrf_token %}
+            <button type="submit" class="nav-item" style="width: 100%; border: none; background: none; text-align: right;">
+                🚪 <span>خروج</span>
+            </button>
+        </form>
+        {% else %}
+        <a href="{% url 'request_otpvi' %}" class="tweet-btn">ورود</a>
+        {% endif %}
+    </aside>
+
+    <!-- فید اصلی ویرایش -->
+    <main class="main">
+        <header class="header">
+            <a href="{% url 'tweet_detail' tweet_id=tweet.id %}" class="back-btn" title="بازگشت">❮</a>
+            <h1>ویرایش توییت</h1>
+            <div>
+                <a href="{% url 'tweet_detail' tweet_id=tweet.id %}" class="cancel-btn">لغو</a>
+                <button type="submit" form="edit-tweet-form" class="post-btn" id="edit-post-btn" disabled>ذخیره</button>
+            </div>
+        </header>
+
+        <form id="edit-tweet-form" method="POST" action="{% url 'edit_tweet' tweet_id=tweet.id %}" enctype="multipart/form-data" class="composer">
+            {% csrf_token %}
+
+            <div class="avatar">
+                {% if user.profile.image %}
+                <img src="{{ user.profile.image.url }}" alt="{{ user.username }}">
+                {% else %}
+                {{ user.username|make_list|first|upper }}
+                {% endif %}
+            </div>
+
+            <div class="composer-content">
+                <textarea name="content" id="tweet-content" placeholder="چه خبر؟" maxlength="280"
+                          oninput="updateCharCount(this)">{{ form.content.value|default:'' }}</textarea>
+
+                <div id="media-preview" style="display: none; margin-top: 10px; position: relative;">
+                    <!-- پیش‌نمایش تصویر -->
+                    {% if tweet.image %}
+                    <div id="image-preview-container" style="display: block;">
+                        <img id="image-preview" class="tweet-image" src="{{ tweet.image.url }}" style="max-height: 200px;">
+                        <button type="button" class="remove-media" onclick="removeMedia('image')">✕</button>
+                    </div>
+                    {% endif %}
+
+                    <!-- پیش‌نمایش ویدیو -->
+                    {% if tweet.video %}
+                    <div id="video-preview-container" style="display: block;">
+                        <video id="video-preview" class="tweet-image" style="max-height: 200px;" controls>
+                            <source src="{{ tweet.video.url }}" type="video/mp4">
+                        </video>
+                        <button type="button" class="remove-media" onclick="removeMedia('video')">✕</button>
+                    </div>
+                    {% endif %}
+
+                    <!-- پیش‌نمایش ویس -->
+                    {% if tweet.voice %}
+                    <div id="voice-preview-container" style="display: block; padding: 10px; background: #f0f0f0; border-radius: 8px;">
+                        <audio id="voice-preview" controls style="width: 100%;">
+                            <source src="{{ tweet.voice.url }}" type="audio/mpeg">
+                        </audio>
+                        <button type="button" class="remove-media" onclick="removeMedia('voice')">✕</button>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="composer-footer">
+                    <div class="composer-icons">
+                        <button type="button" title="افزودن تصویر" onclick="document.getElementById('tweet-image').click()">🖼️</button>
+                        <input type="file" id="tweet-image" name="image" accept="image/*" style="display: none;" onchange="previewMedia(this, 'image')">
+
+                        <button type="button" title="افزودن ویدیو" onclick="document.getElementById('tweet-video').click()">🎥</button>
+                        <input type="file" id="tweet-video" name="video" accept="video/*" style="display: none;" onchange="previewMedia(this, 'video')">
+
+                        <button type="button" id="voice-record-btn" title="ضبط صدا" onclick="toggleVoiceRecording()">🎤</button>
+                        <input type="file" id="tweet-voice" name="voice" accept="audio/*" style="display: none;">
+
+                        <div id="voice-recording-panel" style="display: none;">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                <span id="recording-indicator" style="width: 12px; height: 12px; background: #f91880; border-radius: 50%; animation: pulse 1s infinite;"></span>
+                                <span id="recording-time" style="font-size: 14px; font-weight: 600;">00:00</span>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button type="button" onclick="startRecording()" id="start-rec-btn" style="background: #f91880; color: white; border: none; padding: 8px 12px; border-radius: 20px; cursor: pointer;">● ضبط</button>
+                                <button type="button" onclick="stopRecording()" id="stop-rec-btn" disabled style="background: #00ba7c; color: white; border: none; padding: 8px 12px; border-radius: 20px; cursor: pointer; opacity: 0.5;">■ توقف</button>
+                                <button type="button" onclick="cancelRecording()" style="background: #536471; color: white; border: none; padding: 8px 12px; border-radius: 20px; cursor: pointer;">لغو</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span id="charCount" style="font-size: 13px; color: var(--gray);">280</span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </main>
+
+    <!-- سایدبار راست -->
+    <aside class="right-sidebar">
+        <div class="search-box">
+            <form method="GET" action="{% url 'search' %}">
+                <input type="text" name="q" placeholder="جستجو" onkeydown="if(event.key === 'Enter'){this.form.submit()}">
+            </form>
+        </div>
+        <div class="trends-box">
+            <h3 class="trends-title">ترندها</h3>
+            {% for hashtag in hashtags %}
+            <div class="trend-item">
+                <div class="trend-name">#{{ hashtag.name }}</div>
+                <div class="trend-count">{{ hashtag.tweet_count }} توییت</div>
+            </div>
+            {% empty %}
+            <div class="trend-item">هیچ ترندی وجود ندارد</div>
+            {% endfor %}
+        </div>
+    </aside>
+</div>
+
+<!-- ناوبری موبایل -->
+<nav class="mobile-nav">
+    <a href="{% url 'home' %}" class="mobile-nav-item"><span class="icon">🏠</span><span>خانه</span></a>
+    <a href="#" class="mobile-nav-item"><span class="icon">🔍</span><span>جستجو</span></a>
+    <a href="#" class="mobile-nav-item"><span class="icon">🔔</span><span>اعلانات</span></a>
+    <a href="#" class="mobile-nav-item"><span class="icon">✉️</span><span>پیام‌ها</span></a>
+    <a href="{% url 'profile' %}" class="mobile-nav-item"><span class="icon">👤</span><span>پروفایل</span></a>
+</nav>
+
+<script>
+    let audioBlob = null;
+    let mediaRecorder, audioChunks = [], recordingInterval, recordingSeconds = 0;
+
+    function updateCharCount(textarea) {
+        const maxLength = 280;
+        const currentLength = textarea.value.length;
+        const charCount = document.getElementById('charCount');
+        const postBtn = document.getElementById('edit-post-btn');
+
+        charCount.textContent = maxLength - currentLength;
+
+        // بررسی وجود محتوا یا مدیا برای فعال کردن دکمه ذخیره
+        const hasContent = currentLength > 0 || audioBlob || document.getElementById('tweet-image').files.length > 0 || document.getElementById('tweet-video').files.length > 0;
+
+        postBtn.disabled = !hasContent;
+        charCount.style.color = currentLength > 260 ? (currentLength > 275 ? '#f91880' : '#ffad1f') : 'var(--gray)';
+    }
+
+    function previewMedia(input, type) {
+        const file = input.files[0];
+        if (!file) return;
+
+        const previewContainer = document.getElementById('media-preview');
+        const imageContainer = document.getElementById('image-preview-container');
+        const videoContainer = document.getElementById('video-preview-container');
+        const voiceContainer = document.getElementById('voice-preview-container');
+
+        // مخفی کردن همه پیش‌نمایش‌ها
+        imageContainer.style.display = 'none';
+        videoContainer.style.display = 'none';
+        voiceContainer.style.display = 'none';
+
+        // پاک کردن فایل‌های دیگر اگر نوع جدیدی انتخاب شد
+        if (type === 'image') {
+            document.getElementById('tweet-video').value = '';
+            document.getElementById('tweet-voice').value = '';
+            audioBlob = null;
+        } else if (type === 'video') {
+            document.getElementById('tweet-image').value = '';
+            document.getElementById('tweet-voice').value = '';
+            audioBlob = null;
+        } else if (type === 'voice') {
+            document.getElementById('tweet-image').value = '';
+            document.getElementById('tweet-video').value = '';
+        }
+
+        if (type === 'image') {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('image-preview').src = e.target.result;
+                imageContainer.style.display = 'block';
+                previewContainer.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        } else if (type === 'video') {
+            const url = URL.createObjectURL(file);
+            document.getElementById('video-preview').src = url;
+            videoContainer.style.display = 'block';
+            previewContainer.style.display = 'block';
+        } else if (type === 'voice') {
+            const url = URL.createObjectURL(file);
+            document.getElementById('voice-preview').src = url;
+            voiceContainer.style.display = 'block';
+            previewContainer.style.display = 'block';
+        }
+        updateCharCount(document.getElementById('tweet-content'));
+    }
+
+    function removeMedia(type) {
+        if (type === 'image') {
+            document.getElementById('tweet-image').value = '';
+            document.getElementById('image-preview-container').style.display = 'none';
+        } else if (type === 'video') {
+            document.getElementById('tweet-video').value = '';
+            document.getElementById('video-preview-container').style.display = 'none';
+        } else if (type === 'voice') {
+            document.getElementById('tweet-voice').value = '';
+            document.getElementById('voice-preview-container').style.display = 'none';
+            audioBlob = null;
+        }
+
+        const hasMedia = document.getElementById('tweet-image').files.length > 0 ||
+                         document.getElementById('tweet-video').files.length > 0 ||
+                         audioBlob !== null ||
+                         document.getElementById('image-preview-container').style.display === 'block' || // اگر عکس قبلی هست
+                         document.getElementById('video-preview-container').style.display === 'block' || // اگر ویدیو قبلی هست
+                         document.getElementById('voice-preview-container').style.display === 'block'; // اگر ویس قبلی هست
+
+        // نکته: در ویرایش، اگر فایل جدیدی آپلود نشود، فایل قبلی حفظ می‌شود.
+        // بنابراین ما فقط چک می‌کنیم که آیا "پیش‌نمایش فعال" وجود دارد یا خیر.
+        // اگر کاربر دکمه ضربدر را زد، پیش‌نمایش مربوطه مخفی می‌شود.
+        // اگر هیچ پیش‌نمایشی نمایش داده نشود و فایل جدیدی هم نباشد، یعنی مدیا حذف شده است.
+
+        const anyPreviewVisible = document.getElementById('image-preview-container').style.display === 'block' ||
+                                  document.getElementById('video-preview-container').style.display === 'block' ||
+                                  document.getElementById('voice-preview-container').style.display === 'block';
+
+        document.getElementById('media-preview').style.display = anyPreviewVisible || hasMedia ? 'block' : 'none';
+        updateCharCount(document.getElementById('tweet-content'));
+    }
+
+    function toggleVoiceRecording() {
+        const panel = document.getElementById('voice-recording-panel');
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    }
+
+    async function startRecording() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({audio: true});
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+            mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
+            mediaRecorder.onstop = () => {
+                audioBlob = new Blob(audioChunks, {type: 'audio/webm'});
+                const audioUrl = URL.createObjectURL(audioBlob);
+                document.getElementById('voice-preview').src = audioUrl;
+                document.getElementById('voice-preview-container').style.display = 'block';
+                document.getElementById('media-preview').style.display = 'block';
+
+                // ایجاد فایل مجازی برای فرم
+                const file = new File([audioBlob], 'voice_message.webm', {type: 'audio/webm'});
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                document.getElementById('tweet-voice').files = dataTransfer.files;
+
+                updateCharCount(document.getElementById('tweet-content'));
+                stream.getTracks().forEach(track => track.stop());
+            };
+            mediaRecorder.start();
+            recordingSeconds = 0;
+            recordingInterval = setInterval(() => {
+                recordingSeconds++;
+                const minutes = Math.floor(recordingSeconds / 60).toString().padStart(2, '0');
+                const seconds = (recordingSeconds % 60).toString().padStart(2, '0');
+                document.getElementById('recording-time').textContent = `${minutes}:${seconds}`;
+            }, 1000);
+            document.getElementById('start-rec-btn').disabled = true;
+            document.getElementById('start-rec-btn').style.opacity = '0.5';
+            document.getElementById('stop-rec-btn').disabled = false;
+            document.getElementById('stop-rec-btn').style.opacity = '1';
+            document.getElementById('recording-indicator').style.animation = 'pulse 1s infinite';
+        } catch (err) {
+            alert('دسترسی به میکروفون امکان‌پذیر نیست.');
+        }
+    }
+
+    function stopRecording() {
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            mediaRecorder.stop();
+            clearInterval(recordingInterval);
+        }
+        document.getElementById('start-rec-btn').disabled = false;
+        document.getElementById('start-rec-btn').style.opacity = '1';
+        document.getElementById('stop-rec-btn').disabled = true;
+        document.getElementById('stop-rec-btn').style.opacity = '0.5';
+        document.getElementById('recording-indicator').style.animation = 'none';
+        document.getElementById('voice-recording-panel').style.display = 'none';
+    }
+
+    function cancelRecording() {
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+        clearInterval(recordingInterval);
+        audioChunks = [];
+        document.getElementById('start-rec-btn').disabled = false;
+        document.getElementById('start-rec-btn').style.opacity = '1';
+        document.getElementById('stop-rec-btn').disabled = true;
+        document.getElementById('stop-rec-btn').style.opacity = '0.5';
+        document.getElementById('recording-indicator').style.animation = 'none';
+        document.getElementById('recording-time').textContent = '00:00';
+        document.getElementById('voice-recording-panel').style.display = 'none';
+    }
+
+    function checkMediaRecorderSupport() {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) document.getElementById('voice-record-btn').style.display = 'none';
+    }
+
+    // راه‌اندازی اولیه
+    document.addEventListener('DOMContentLoaded', function () {
+        checkMediaRecorderSupport();
+        // تنظیم اولیه دکمه بر اساس محتوای فعلی
+        const textarea = document.getElementById('tweet-content');
+        if(textarea) updateCharCount(textarea);
+    });
+</script>
+</body>
+</html>

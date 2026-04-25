@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -68,14 +70,22 @@ class Tweets(models.Model):
     def is_reply(self):
         return self.parent is not None
 
+    @property
+    def is_edit(self):
+        if not self.created_at:
+            return False
+
+        time_diff = timezone.now() - self.created_at
+        return time_diff <= datetime.timedelta(minutes=30)
+
     # Hashtag
     def extract_and_save_hashtags(self):
         import re
         hashtag_name = re.findall(r'#\w+', self.content)
         for name in hashtag_name:
             hashtag, create = Hashtag.objects.get_or_create(name=name)
-            if not self.hashtags.filter(id=hashtag.id).exists():
-                self.hashtags.add(hashtag)
+            if not self.hashtag.filter(id=hashtag.id).exists():
+                self.hashtag.add(hashtag)
                 hashtag.tweet_count += 1
                 hashtag.last_used = timezone.now()
                 hashtag.save()
