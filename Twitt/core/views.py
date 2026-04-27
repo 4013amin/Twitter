@@ -54,7 +54,7 @@ def request_otp_view(request):
             # Send SMS
             try:
                 print("در حال ارسال SMS...")
-                result = sms_service.send_sms(phone, otp.code)
+                result = sms_service.send_sms(phone , code = otp.code)
                 print(f"SMS ارسال شد! نتیجه: {result}")
             except Exception as e:
                 print(f"خطای SMS: {e}")
@@ -411,6 +411,8 @@ def home(request):
             ).values_list('tweet_id', flat=True)
         )
 
+    hashtags = get_trending_hashtags()
+
     tweet_list = []
     for tweet in tweets:
         user_profile = getattr(tweet.user, 'profile', None)
@@ -432,9 +434,7 @@ def home(request):
                 'created_at': comment.created_at,
             })
 
-        # HashTag
-        hashtags = get_trending_hashtags()
-
+        
         tweet_list.append({
             'id': tweet.id,
             'content': tweet.content,
@@ -449,15 +449,12 @@ def home(request):
             'comments_count': tweet.comments_count_annotate,
             'user_liked': tweet.id in user_liked_tweets,
             'comments': comments_data,
-            # برای راحتی در تمپلیت می‌توانید متد مجازی هم اضافه کنید:
-            # 'get_user_display_name': lambda: user_display_name
         })
 
     return render(request, 'home/home.html', {
         'tweets': tweet_list,
-        'hashtags': hashtags,
+        'hashtags': hashtags,  
     })
-
 
 @login_required
 def create_tweet(request):
