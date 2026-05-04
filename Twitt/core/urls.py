@@ -7,6 +7,7 @@ from . import views
 from . import consumers
 
 urlpatterns = [
+    #login and Profile
     path('', views.home, name='home'),
     path('request-otpv/', views.request_otp_view, name='request_otpvi'),
     path('verify-otp/<str:phone>/', views.verify_otp_view, name='verify_otp'),
@@ -14,8 +15,9 @@ urlpatterns = [
     path('profile/', views.profile_view, name='profile'),
     path('profile/<str:username>/', views.profile_view, name='profile'),
     path('profile/<str:username>/', views.profile_view, name='user_profile'),
-
     path('edit-profile/', views.edit_profile_view, name='edit_profile'),
+    
+    #Tweets
     path('create-tweet/', views.create_tweet, name='create_tweet'),
     path('edit-tweet/<int:tweet_id>/', views.edit_tweet, name='edit_tweet'),
     path('tweet/<int:tweet_id>/', views.tweet_detail, name='tweet_detail'),
@@ -27,6 +29,7 @@ urlpatterns = [
     path('tweet/<int:tweet_id>/comment/', views.add_comment, name='add_comment'),
     path('tweet/<int:tweet_id>/delete_comment/', views.delete_comment, name='delete_comment'),
 
+    #Search
     path('search/', views.search_view, name='search'),
 
     # Follow
@@ -36,6 +39,8 @@ urlpatterns = [
     path('<int:user_id>/followers/', views.followers_list, name='followers_list'),
     path('<int:user_id>/following/', views.following_list, name='following_list'),
 
+    
+    #logout
     path('logout/', views.logout_view, name='logout'),
 ]
 
