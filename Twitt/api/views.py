@@ -341,3 +341,4 @@ class ProfileAPIView(APIView):
             'tweets': tweets_serializer.data,
             'active_tab': active_tab,
         })
+        
