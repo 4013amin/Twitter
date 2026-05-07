@@ -19,6 +19,7 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.authtoken.models import Token
 from django.db.models import Q, Count, Prefetch
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample, OpenApiResponse
 
 logger = logging.getLogger(__name__)
 
@@ -27,34 +28,29 @@ logger = logging.getLogger(__name__)
 
 class RequestOTPAPIView(APIView):
     permission_classes = (AllowAny,)
-
-    @swagger_auto_schema(
-        operation_description="ارسال کد تأیید (OTP) به شماره تلفن",
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            required=['phone'],
-            properties={
-                'phone': openapi.Schema(
-                    type=openapi.TYPE_STRING,
-                    description='شماره تلفن همراه (با پیشوند کد کشور)',
-                    example='989123456789'
-                ),
-            },
-        ),
+    
+    @extend_schema(
+        summary="درخواست کد تأیید (OTP)",
+        description="یک کد ۶ رقمی به شماره تلفن وارد شده ارسال می‌شود. از این endpoint برای شروع فرآیند ورود استفاده کنید.",
+        request=serializers.RequestOTPSerializer,
         responses={
-            200: openapi.Response(
-                description='کد OTP با موفقیت ارسال شد',
-                schema=openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    properties={
-                        'message': openapi.Schema(type=openapi.TYPE_STRING),
-                        'phone': openapi.Schema(type=openapi.TYPE_STRING),
-                    },
-                ),
+            200: OpenApiResponse(
+                response=serializers.RequestOTPSerializer,
+                description="کد OTP با موفقیت ارسال شد",
+                examples=[
+                    OpenApiExample(
+                        "موفقیت‌آمیز",
+                        value={
+                            "message": "کد تأیید با موفقیت ارسال شد",
+                            "phone": "989123456789"
+                        }
+                    )
+                ]
             ),
-            400: openapi.Response(description='خطا در اعتبارسنجی'),
+            400: OpenApiResponse(description="خطا در اعتبارسنجی شماره تلفن"),
         },
-        tags=['احراز هویت'],
+        tags=["احراز هویت"],
+        operation_id="request_otp/",
     )
     def post(self, request, *args, **kwargs):
         serializer = serializers.RequestOTPSerializer(data=request.data)
@@ -64,8 +60,11 @@ class RequestOTPAPIView(APIView):
             otp.code = str(random.randint(100000, 999999))
             otp.created_at = timezone.now()
             otp.save()
+            
+            logger.info(f"OTP for {phone}: {otp.code}")
+            
             return Response({
-                'message': "OTP send successfully",
+                'message': "OTP send su ccessfully",
                 'phone': phone
             }, status=status.HTTP_200_OK)
         else:
@@ -83,51 +82,59 @@ class VerifyOTPAPIView(APIView):
         example='989123456789'
     )
 
-    @swagger_auto_schema(
-        operation_description="تأیید کد OTP و ورود به سیستم",
-        manual_parameters=[phone_param],
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            required=['code'],
-            properties={
-                'code': openapi.Schema(
-                    type=openapi.TYPE_STRING,
-                    description='کد ۶ رقمی ارسال شده به تلفن',
-                    example='123456'
-                ),
-            },
-        ),
+
+    @extend_schema(
+        summary="تأیید کد OTP و ورود",
+        description="کد ۶ رقمی دریافتی را به همراه شماره تلفن ارسال کنید. در صورت موفقیت، توکن احراز هویت دریافت می‌کنید.",
+        parameters=[
+            OpenApiParameter(
+                name='phone',
+                location=OpenApiParameter.PATH,
+                description="شماره تلفن کاربر (همان شماره‌ای که کد به آن ارسال شده)",
+                required=True,
+                type=str,
+                examples=[
+                    OpenApiExample(
+                        "شماره نمونه",
+                        value="989123456789"
+                    )
+                ]
+            ),
+        ],
+        request=serializers.VerifyOTPSerializer,
         responses={
-            200: openapi.Response(
-                description='ورود موفقیت‌آمیز',
-                examples={
-                    'application/json': {
-                        'message': 'ورود موفقیت‌آمیز بود.',
-                        'redirect_url': 'home',
-                        'user_id': 1,
-                        'profile_completed': True
-                    }
-                },
+            200: OpenApiResponse(
+                description="ورود موفقیت‌آمیز",
+                examples=[
+                    OpenApiExample(
+                        "پروفایل تکمیل شده",
+                        value={
+                            "message": "ورود موفقیت‌آمیز بود.",
+                            "redirect_url": "home",
+                            "user_id": 1,
+                            "token": "a1b2c3d4e5f6...",
+                            "profile_completed": True
+                        }
+                    ),
+                    OpenApiExample(
+                        "نیاز به تکمیل پروفایل",
+                        value={
+                            "message": "لطفاً پروفایل خود را تکمیل کنید.",
+                            "redirect_url": "setup_profile",
+                            "user_id": 2,
+                            "token": "f6e5d4c3b2a1...",
+                            "profile_completed": False
+                        }
+                    )
+                ]
             ),
-            400: openapi.Response(
-                description='کد منقضی شده',
-                examples={
-                    'application/json': {
-                        'error': 'کد منقضی شده است.'
-                    }
-                },
-            ),
-            404: openapi.Response(
-                description='کد نادرست',
-                examples={
-                    'application/json': {
-                        'error': 'کد تایید نادرست است.'
-                    }
-                },
-            ),
+            400: OpenApiResponse(description="کد منقضی شده یا نادرست"),
+            404: OpenApiResponse(description="کد تأیید یافت نشد"),
         },
-        tags=['احراز هویت'],
+        tags=["احراز هویت"],
+        operation_id="verify_otp",
     )
+    
     def post(self, request, phone, *args, **kwargs):
         serializer = serializers.VerifyOTPSerializer(data=request.data)
         if not serializer.is_valid():
@@ -185,43 +192,34 @@ class VerifyOTPAPIView(APIView):
 class SetupProfileAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
-    @swagger_auto_schema(
-        operation_description="تکمیل اطلاعات پروفایل کاربر (فقط برای کاربران جدید)",
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            required=['name'],
-            properties={
-                'name': openapi.Schema(
-                    type=openapi.TYPE_STRING,
-                    description='نام و نام خانوادگی کاربر',
-                    example='علی محمدی'
-                ),
-                'phone': openapi.Schema(
-                    type=openapi.TYPE_STRING,
-                    description='شماره تلفن همراه (اختیاری)',
-                    example='989123456789'
-                ),
-            },
-        ),
+
+    @extend_schema(
+        summary="تکمیل پروفایل کاربر",
+        description="پس از اولین ورود، اطلاعات پروفایل خود را تکمیل کنید. این endpoint فقط برای کاربرانی که پروفایل ندارند قابل استفاده است.",
+        request=serializers.SetupProfileSerializer,
         responses={
-            200: openapi.Response(
-                description='پروفایل با موفقیت تکمیل شد',
-                examples={
-                    'application/json': {
-                        'message': 'پروفایل با موفقیت تکمیل شد.',
-                        'redirect_url': 'home',
-                        'profile': {
-                            'name': 'علی محمدی',
-                            'phone': '989123456789',
-                        },
-                        'profile_completed': True
-                    }
-                },
+            200: OpenApiResponse(
+                description="پروفایل با موفقیت تکمیل شد",
+                examples=[
+                    OpenApiExample(
+                        "موفقیت‌آمیز",
+                        value={
+                            "message": "پروفایل با موفقیت تکمیل شد.",
+                            "redirect_url": "home",
+                            "profile": {
+                                "name": "علی محمدی",
+                                "phone": "989123456789",
+                            },
+                            "profile_completed": True
+                        }
+                    )
+                ]
             ),
-            400: openapi.Response(description='خطا در اعتبارسنجی'),
-            401: openapi.Response(description='احراز هویت نشده'),
+            400: OpenApiResponse(description="خطا در اطلاعات وارد شده"),
+            401: OpenApiResponse(description="لطفاً ابتدا وارد شوید"),
         },
-        tags=['پروفایل'],
+        tags=["پروفایل"],
+        operation_id="setup_profile",
     )
     def post(self, request, *args, **kwargs):
         profile, created = Profile.objects.get_or_create(
@@ -270,6 +268,8 @@ class SetupProfileAPIView(APIView):
 class ProfileAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
+    
+    
     username_param = openapi.Parameter(
         'username',
         openapi.IN_QUERY,
@@ -277,28 +277,55 @@ class ProfileAPIView(APIView):
         type=openapi.TYPE_STRING,
         example='989123456789'
     )
-
-    @swagger_auto_schema(
-        operation_description="دریافت اطلاعات پروفایل کاربر",
-        manual_parameters=[username_param],
-        responses={
-            200: openapi.Response(
-                description='اطلاعات پروفایل',
-                examples={
-                    'application/json': {
-                        'profile': {
-                            'id': 1,
-                            'name': 'علی محمدی',
-                            'phone': '989123456789',
-                        }
-                    }
-                },
+    
+    
+    @extend_schema(
+        summary="مشاهده پروفایل",
+        description="پروفایل کاربر را با تب‌های مختلف (پست‌ها، پاسخ‌ها، رسانه‌ها، لایک‌ها) مشاهده کنید.",
+        parameters=[
+            OpenApiParameter(
+                name='username',
+                location=OpenApiParameter.QUERY,
+                description="نام کاربری برای مشاهده (اختیاری - اگر وارد نشود پروفایل خودتان نمایش داده می‌شود)",
+                required=False,
+                type=str,
             ),
-            401: openapi.Response(description='احراز هویت نشده'),
-            404: openapi.Response(description='کاربر یافت نشد'),
+            OpenApiParameter(
+                name='tab',
+                location=OpenApiParameter.QUERY,
+                description="تب مورد نظر برای نمایش",
+                required=False,
+                type=str,
+                enum=['posts', 'replies', 'media', 'likes'],
+                default='posts',
+            ),
+        ],
+        responses={
+            200: OpenApiResponse(
+                description="اطلاعات پروفایل",
+                examples=[
+                    OpenApiExample(
+                        "پروفایل کامل",
+                        value={
+                            "profile": {
+                                "id": 1,
+                                "name": "علی محمدی",
+                                "phone": "989123456789",
+                            },
+                            "tweets": [],
+                            "active_tab": "posts",
+                            "tweets_count": 0
+                        }
+                    )
+                ]
+            ),
+            401: OpenApiResponse(description="لطفاً ابتدا وارد شوید"),
+            404: OpenApiResponse(description="کاربر یافت نشد"),
         },
-        tags=['پروفایل'],
+        tags=["پروفایل"],
+        operation_id="view_profile",
     )
+
     def get(self, request, username=None):
         if username:
             user_instance = get_object_or_404(User, username=username)
