@@ -56,23 +56,7 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
-SPECTACULAR_SETTINGS = {
-    'TITLE': 'Twitter API',
-    'DESCRIPTION': 'Documentation of the Twitter API',
-    'VERSION': '1.0.0',
-    'SECURITY_SCHEMES': {
-        'Bearer': {
-            'type': 'http',
-            'scheme': 'bearer',
-            'bearerFormat': 'Token',
-        },
-    },
-    'SECURITY': [{'Bearer': []}],
-    'AUTHENTICATION_WHITELIST': [
-        'rest_framework.authentication.TokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    ],
-}
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -185,16 +169,22 @@ SPECTACULAR_SETTINGS = {
     'TITLE': 'Twitter API',
     'DESCRIPTION': 'Documentation of the Twitter API',
     'VERSION': '1.0.0',
-    # اضافه کردن تعریف دقیق برای Bearer Token
+    'SECURITY_SCHEMES': {
+        'Bearer': {
+            'type': 'http',
+            'scheme': 'bearer',
+            'bearerFormat': 'Token',
+        },
+    },
+    'SECURITY': [{'Bearer': []}],
     'AUTHENTICATION_WHITELIST': [
         'rest_framework.authentication.TokenAuthentication',
-        # اگر از JWT استفاده می‌کنید، نام کلاس auth مربوطه را اینجا بنویسید
+        'rest_framework.authentication.SessionAuthentication',
     ],
-    'SECURITY': [
-        {
-            'Bearer': []
-        },
-    ],
+    'SWAGGER_UI_SETTINGS': {
+        'persistAuthorization': True,
+        'displayOperationId': True,
+    },
 }
 
 LOGGING = {
