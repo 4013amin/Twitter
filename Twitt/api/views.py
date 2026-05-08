@@ -73,16 +73,6 @@ class RequestOTPAPIView(APIView):
 
 class VerifyOTPAPIView(APIView):
     permission_classes = (AllowAny,)
-
-    phone_param = openapi.Parameter(
-        'phone',
-        openapi.IN_PATH,
-        description="شماره تلفن کاربر",
-        type=openapi.TYPE_STRING,
-        example='989123456789'
-    )
-
-
     @extend_schema(
         summary="تأیید کد OTP و ورود",
         description="کد ۶ رقمی دریافتی را به همراه شماره تلفن ارسال کنید. در صورت موفقیت، توکن احراز هویت دریافت می‌کنید.",
@@ -134,59 +124,8 @@ class VerifyOTPAPIView(APIView):
         tags=["احراز هویت"],
         operation_id="verify_otp",
     )
-    
-    def post(self, request, phone, *args, **kwargs):
-        serializer = serializers.VerifyOTPSerializer(data=request.data)
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        code = serializer.validated_data['code']
-        try:
-            otp = get_object_or_404(OTP, phone=phone, code=code)
-        except OTP.DoesNotExist:
-            return Response(
-                {'error': 'کد تایید نادرست است.'},
-                status=status.HTTP_404_NOT_FOUND
-            )
-        if otp.created_at < timezone.now() - timedelta(minutes=2):
-            otp.delete()
-            return Response(
-                {'error': 'کد منقضی شده است.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        otp.delete()
-        user = User.objects.filter(username=phone).first()
-        if not user:
-            user = User.objects.create_user(username=phone)
-
-        token, created = Token.objects.get_or_create(user=user)
-
-        profile = Profile.objects.filter(user=user).first()
-        if not profile:
-            existing_profile = Profile.objects.filter(phone=phone).first()
-            if existing_profile:
-                existing_profile.user = user
-                existing_profile.save()
-                profile = existing_profile
-            else:
-                profile = Profile.objects.create(
-                    user=user,
-                    phone=phone,
-                    name=''
-                )
-        login(request, user)
-        if profile.name:
-            redirect_url = 'home'
-            message = 'ورود موفقیت‌آمیز بود.'
-        else:
-            redirect_url = 'setup_profile'
-            message = 'لطفاً پروفایل خود را تکمیل کنید.'
-        return Response({
-            'message': message,
-            'redirect_url': redirect_url,
-            'user_id': user.id,
-            'token': token.key,
-            'profile_completed': bool(profile.name)
-        }, status=status.HTTP_200_OK)
+    def post(self, request, *args, **kwargs):
+            
 
 
 class SetupProfileAPIView(APIView):
