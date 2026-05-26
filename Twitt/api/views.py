@@ -20,6 +20,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.authtoken.models import Token
 from django.db.models import Q, Count, Prefetch
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample, OpenApiResponse
+from rest_framework_simplejwt.tokens import RefreshToken
 
 logger = logging.getLogger(__name__)
 
@@ -125,6 +126,52 @@ class VerifyOTPAPIView(APIView):
         operation_id="verify_otp",
     )
     def post(self, request, *args, **kwargs):
+        serializer = serializers.VerifyOTPSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        phone = serializer.validated_data['phone']
+        code = serializer.validated_data['code']
+
+        # جستجوی OTP برای شماره داده‌شده
+        try:
+            otp = OTP.objects.get(phone=phone, code=code)
+        except OTP.DoesNotExist:
+            return Response(
+                {"detail": "کد تأیید یافت نشد یا نادرست است."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # بررسی منقضی بودن کد (مثلاً اگر بیشتر از ۲ دقیقه گذشته باشد)
+        expiry_time = otp.created_at + timezone.timedelta(minutes=2)
+        if timezone.now() > expiry_time:
+            return Response(
+                {"detail": "کد منقضی شده است."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # اگر کاربر وجود ندارد، ایجادش کن
+        user, created = User.objects.get_or_create(
+            phone=phone,
+            defaults={'username': phone}
+        )
+
+        # حذف OTP (برای امنیت)
+        otp.delete()
+
+        # تولید توکن جدید
+        refresh = RefreshToken.for_user(user)
+
+        # بررسی تکمیل بودن پروفایل
+        profile_completed = hasattr(user, 'profile') and user.profile.is_complete
+        redirect_url = "home" if profile_completed else "setup_profile"
+
+        return Response({
+            "message": "ورود موفقیت‌آمیز بود." if profile_completed else "لطفاً پروفایل خود را تکمیل کنید.",
+            "redirect_url": redirect_url,
+            "user_id": user.id,
+            "token": str(refresh.access_token),
+            "profile_completed": profile_completed
+        }, status=status.HTTP_200_OK)
             
 
 
