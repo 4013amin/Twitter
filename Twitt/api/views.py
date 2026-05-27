@@ -355,3 +355,7 @@ class ProfileAPIView(APIView):
             'active_tab': active_tab,
         })
         
+        
+class EditProfileAPIView(APIView):
+    def post(request ,*args, **kwargs):
+        serializer = 
