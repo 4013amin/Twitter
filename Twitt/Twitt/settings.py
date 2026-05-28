@@ -201,21 +201,21 @@ LOGGING = {
         'console': {
             'class': 'logging.StreamHandler',
             'formatter': 'verbose',
-            'stream': 'ext://sys.stdout',  # خروجی به stdout
+            'stream': 'ext://sys.stdout',
         },
-        'file': {
-            'class': 'logging.FileHandler',
-            'filename': '/tmp/django_debug.log',
-            'formatter': 'verbose',
-        },
+        # 'file': {  <-- این خط را کامنت کن
+        #     'class': 'logging.FileHandler',
+        #     'filename': '/tmp/django_debug.log',  <-- این خط مشکل‌ساز است
+        #     'formatter': 'verbose',
+        # },
     },
     'root': {
-        'handlers': ['console', 'file'],
+        'handlers': ['console'],  
         'level': 'DEBUG',
     },
     'loggers': {
         'django': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console'], 
             'level': 'INFO',
             'propagate': False,
         },

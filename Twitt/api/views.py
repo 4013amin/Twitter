@@ -358,4 +358,11 @@ class ProfileAPIView(APIView):
         
 class EditProfileAPIView(APIView):
     def post(request ,*args, **kwargs):
-        serializer = 
+        serializer = serializers.PostsSerializer(data = request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        name = serializer.validated_data.get('name', '').strip()
+        bio = serializer.validated_data.get('bio', '').strip()
+        phone = serializer.validated_data.get('phone', '').strip()
+        image = serializer.validated_data.get('image')
