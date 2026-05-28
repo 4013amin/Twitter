@@ -357,12 +357,68 @@ class ProfileAPIView(APIView):
         
         
 class EditProfileAPIView(APIView):
-    def post(request ,*args, **kwargs):
-        serializer = serializers.PostsSerializer(data = request.data)
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+    summary="ویرایش پروفایل",
+    description="کاربر می‌تواند اطلاعات پروفایل خود را ویرایش کند.",
+    request=serializers.SetupProfileSerializer,
+    responses={
+        200: OpenApiResponse(
+            description="ویرایش موفقیت‌آمیز پروفایل",
+            examples=[
+                OpenApiExample(
+                    "موفقیت‌آمیز",
+                    value={
+                        "message": "ذخیره با موفقیت انجام شد"
+                    }
+                )
+            ]
+        ),
+        400: OpenApiResponse(
+            description="خطا در اطلاعات وارد شده"
+        ),
+        401: OpenApiResponse(
+            description="احراز هویت نشده"
+        ),
+    },
+        tags=["پروفایل"],
+        operation_id="edit_profile",
+    )
+
+    def post(self, request, *args, **kwargs):
+
+        profile = get_object_or_404(Profile, user=request.user)
+
+        serializer = serializers.SetupProfileSerializer(data=request.data)
+
         if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         name = serializer.validated_data.get('name', '').strip()
         bio = serializer.validated_data.get('bio', '').strip()
         phone = serializer.validated_data.get('phone', '').strip()
         image = serializer.validated_data.get('image')
+
+        if Profile.objects.exclude(user=request.user).filter(name=name).exists():
+            return Response(
+                {'error': 'از این نام قبلا استفاده شده است'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        profile.name = name
+        profile.bio = bio
+        profile.phone = phone
+
+        if image:
+            profile.image = image
+
+        profile.save()
+
+        return Response({
+            'message': 'ذخیره با موفقیت انجام شد'
+        }, status=status.HTTP_200_OK)
+ 
