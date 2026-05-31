@@ -9,7 +9,9 @@ urlpatterns = [
     
     #Profile
     path('profileView/', views.ProfileAPIView.as_view(), name='ProfileView'),
-    path('stup_Profile/' , views.SetupProfileAPIView.as_view() , name="stup_Profile")
+    path('stup_Profile/' , views.SetupProfileAPIView.as_view() , name="stup_Profile"),
+    path('delete_Profile/' , views.DeleteProfileReAPIView.as_view() , name="delete_Request_Profile"),
+
     
     
 ]
