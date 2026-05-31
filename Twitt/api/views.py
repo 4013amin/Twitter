@@ -1,3 +1,5 @@
+import string
+import time
 from datetime import timedelta
 from xml import parsers
 from django.contrib.auth import login
@@ -29,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 class RequestOTPAPIView(APIView):
     permission_classes = (AllowAny,)
-    
+
     @extend_schema(
         summary="درخواست کد تأیید (OTP)",
         description="یک کد ۶ رقمی به شماره تلفن وارد شده ارسال می‌شود. از این endpoint برای شروع فرآیند ورود استفاده کنید.",
@@ -61,9 +63,9 @@ class RequestOTPAPIView(APIView):
             otp.code = str(random.randint(100000, 999999))
             otp.created_at = timezone.now()
             otp.save()
-            
+
             logger.info(f"OTP for {phone}: {otp.code}")
-            
+
             return Response({
                 'message': "OTP send su ccessfully",
                 'phone': phone
@@ -74,6 +76,7 @@ class RequestOTPAPIView(APIView):
 
 class VerifyOTPAPIView(APIView):
     permission_classes = (AllowAny,)
+
     @extend_schema(
         summary="تأیید کد OTP و ورود",
         description="کد ۶ رقمی دریافتی را به همراه شماره تلفن ارسال کنید. در صورت موفقیت، توکن احراز هویت دریافت می‌کنید.",
@@ -172,12 +175,10 @@ class VerifyOTPAPIView(APIView):
             "token": str(refresh.access_token),
             "profile_completed": profile_completed
         }, status=status.HTTP_200_OK)
-            
 
 
 class SetupProfileAPIView(APIView):
     permission_classes = [IsAuthenticated]
-
 
     @extend_schema(
         summary="تکمیل پروفایل کاربر",
@@ -254,8 +255,6 @@ class SetupProfileAPIView(APIView):
 class ProfileAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
-    
-    
     username_param = openapi.Parameter(
         'username',
         openapi.IN_QUERY,
@@ -263,8 +262,7 @@ class ProfileAPIView(APIView):
         type=openapi.TYPE_STRING,
         example='989123456789'
     )
-    
-    
+
     @extend_schema(
         summary="مشاهده پروفایل",
         description="پروفایل کاربر را با تب‌های مختلف (پست‌ها، پاسخ‌ها، رسانه‌ها، لایک‌ها) مشاهده کنید.",
@@ -311,7 +309,6 @@ class ProfileAPIView(APIView):
         tags=["پروفایل"],
         operation_id="view_profile",
     )
-
     def get(self, request, username=None):
         if username:
             user_instance = get_object_or_404(User, username=username)
@@ -354,38 +351,37 @@ class ProfileAPIView(APIView):
             'tweets': tweets_serializer.data,
             'active_tab': active_tab,
         })
-        
-        
+
+
 class EditProfileAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
-    summary="ویرایش پروفایل",
-    description="کاربر می‌تواند اطلاعات پروفایل خود را ویرایش کند.",
-    request=serializers.SetupProfileSerializer,
-    responses={
-        200: OpenApiResponse(
-            description="ویرایش موفقیت‌آمیز پروفایل",
-            examples=[
-                OpenApiExample(
-                    "موفقیت‌آمیز",
-                    value={
-                        "message": "ذخیره با موفقیت انجام شد"
-                    }
-                )
-            ]
-        ),
-        400: OpenApiResponse(
-            description="خطا در اطلاعات وارد شده"
-        ),
-        401: OpenApiResponse(
-            description="احراز هویت نشده"
-        ),
-    },
+        summary="ویرایش پروفایل",
+        description="کاربر می‌تواند اطلاعات پروفایل خود را ویرایش کند.",
+        request=serializers.SetupProfileSerializer,
+        responses={
+            200: OpenApiResponse(
+                description="ویرایش موفقیت‌آمیز پروفایل",
+                examples=[
+                    OpenApiExample(
+                        "موفقیت‌آمیز",
+                        value={
+                            "message": "ذخیره با موفقیت انجام شد"
+                        }
+                    )
+                ]
+            ),
+            400: OpenApiResponse(
+                description="خطا در اطلاعات وارد شده"
+            ),
+            401: OpenApiResponse(
+                description="احراز هویت نشده"
+            ),
+        },
         tags=["پروفایل"],
         operation_id="edit_profile",
     )
-
     def post(self, request, *args, **kwargs):
 
         profile = get_object_or_404(Profile, user=request.user)
@@ -421,4 +417,69 @@ class EditProfileAPIView(APIView):
         return Response({
             'message': 'ذخیره با موفقیت انجام شد'
         }, status=status.HTTP_200_OK)
- 
+
+
+class DeleteProfileReAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        summary="درخواست حذف حساب کاربری",
+        description="یک کد تایید برای حذف حساب کاربری به شماره همراه کاربر ارسال می‌شود.",
+        responses={
+            200: OpenApiResponse(
+                description="کد با موفقیت ارسال شد",
+                examples=[OpenApiExample("نمونه", value={"message": "کد تایید ارسال شد", "code": "123456"})]
+            ),
+            401: OpenApiResponse(description="عدم دسترسی (وارد حساب شوید)"),
+        },
+        tags=["پروفایل"],
+        operation_id="request_delete_account",
+    )
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        otp, created = OTP.objects.get_or_create(phone=user.username)
+        otp.code = ''.join(random.choices(string.digits, k=6))
+        otp.created_at = timezone.now()
+        otp.save()
+
+        # Send Message
+
+        logger.info(f"کد حذف حساب برای {user.username}: {otp.code}")
+
+        return Response({
+            'message': "کد تایید برای حذف حساب ارسال شد.",
+            'code': otp.code
+        }, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        summary="تایید نهایی و حذف حساب کاربری",
+        description="با ارسال کد دریافت شده، حساب کاربری و پروفایل به طور کامل حذف خواهند شد.",
+        request=serializers.VerifyOTPSerializer,  # از همان سریالایزر کد استفاده کنید
+        responses={
+            204: OpenApiResponse(description="حساب با موفقیت حذف شد"),
+            400: OpenApiResponse(description="کد اشتباه یا منقضی شده است"),
+            401: OpenApiResponse(description="عدم دسترسی"),
+        },
+        tags=["پروفایل"],
+        operation_id="confirm_delete_account",
+    )
+    def delete(self, request, *args, **kwargs):
+        serializer = serializers.VerifyOTPSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        code = serializer.validated_data.get('code')
+        user = request.user
+
+        try:
+            otp = OTP.objects.get(phone=user.username, code=code)
+
+            if otp.created_at < timezone.now() - timedelta(minutes=5):
+                return Response({"detail": "کد منقضی شده است."}, status=status.HTTP_400_BAD_REQUEST)
+
+            user.delete()
+            otp.delete()
+
+            return Response({"detail": "حساب کاربری شما با موفقیت حذف شد."}, status=status.HTTP_204_NO_CONTENT)
+
+        except OTP.DoesNotExist:
+            return Response({"detail": "کد وارد شده اشتباه است."}, status=status.HTTP_400_BAD_REQUEST)
